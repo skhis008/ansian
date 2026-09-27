@@ -270,7 +270,6 @@ npm run build      # build produksi  -> .output/
 npm run preview    # preview hasil build
 npm run generate   # static generate (caveat: lihat di bawah)
 ```
-
 ### Catatan penting soal production
 
 App ini **bukan situs statis** — ada SSR (`routeRules` → `ssr: true` untuk `/rider/**`, `/driver/**`, `/admin/**`) dan ada Nitro server routes (`server/routes/api/v1/`). Jadi:
@@ -367,6 +366,51 @@ Secara default aplikasi memakai mock API bawaan di `server/utils/mockApi` agar d
 
 ---
 
+## Kualitas Kode
+
+```bash
+npm run typecheck   # TypeScript strict — WAJIB lolos, exit 0
+npm run lint        # ESLint (flat config via @nuxt/eslint)
+npm run lint:fix    # ESLint + autofix
+```
+
+> **Status saat ini: `npm run lint` belum bersih.** Baseline: **23 error + 50 warning**.
+> Jadi `lint` **belum bisa dipakai sebagai gerbang** (exit 1) — perlu PR terpisah
+> sampai hijau. `npm run typecheck` **sudah hijau** (0 error).
+
+Rule yang paling banyak violation:
+
+| Rule | Jumlah | Catatan |
+| --- | --- | --- |
+| `vue/require-default-prop` | 25 | props optional butuh `default` |
+| `@typescript-eslint/no-unused-vars` | 20 | impor/variabel tak terpakai |
+| `@typescript-eslint/no-explicit-any` | 20 | sudah di-set `warn` |
+| `vue/first-attribute-linebreak` | 3 | formatting |
+| `import/no-duplicates` | 2 | impor `h3` berulang |
+| `vue/no-required-prop-with-default` | 2 | |
+| `vue/no-ref-as-operand` | 1 | lihat catatan di bawah |
+
+### ⚠️ Jangan asal `lint --fix` untuk `no-unused-vars`
+
+Ada minimal satu kasus di mana "variabel unused" itu **memang harus tetap ada** —
+memanggilnya efek sampingnya yang penting:
+
+```ts
+// server/utils/mockApi/rides.ts — createConversation
+const user = authUser(event)   // ❌ JANGAN dihapus barisnya
+```
+
+`authUser()` **throw 401** kalau tidak ada session (lihat `server/utils/api.ts`). Baris
+itu adalah **auth guard** untuk endpoint tersebut. Assignment-nya yang tidak dipakai, bukan
+panggilannya. Kalau dihapus, endpoint `POST /api/v1/conversations` jadi bisa diakses
+tanpa login. Perbaikannya hanya buang assignment-nya:
+
+```ts
+authUser(event)   // ✅ guard tetap jalan, tanpa variabel sia-sia
+```
+
+---
+
 ## Troubleshooting
 
 ### `ERR_MODULE_NOT_FOUND: .../node_modules/dist/index.mjs`
@@ -383,15 +427,9 @@ Sebagai pengingat: kalau memang harus menyalin project, pakai `cp -a` / `rsync -
 
 Default bind ke `localhost` saja. Pakai `npm run dev -- --host`.
 
-### `npm run lint` error — `eslint: command not found`
-
-Script `lint` ada di `package.json` tapi **eslint belum terinstall** (belum ada di `devDependencies`, dan belum ada file konfigurasinya). Ini known issue yang belum dibenerin.
-
-Sebagai gantinya, andalkan **`npm run typecheck`** untuk pengecekan — itu jalan normal (TypeScript `strict: true`).
-
 ### `npm run typecheck` keluar stack trace padahal sukses
 
-Kalau muncul `(Vue) Resolve plugin path failed: ... ERR_PACKAGE_PATH_NOT_EXPORTED`, **itu bukan error**. Cuma plugin bahasa Vue yang gagal resolve subpath `vue-router/volar/...` yang tidak di-export di versi `vue-router` yang terpasang. Quay exit code tetap `0` dan jumlah `error TS` = 0. Abaikan saja.
+Kalau muncul `(Vue) Resolve plugin path failed: ... ERR_PACKAGE_PATH_NOT_EXPORTED`, **itu bukan error**. Cuma plugin bahasa Vue yang gagal resolve subpath `vue-router/volar/...` yang tidak di-export di versi `vue-router` yang terpasang. Exit code tetap `0` dan jumlah `error TS` = 0. Abaikan saja.
 
 ### `npm install` / `npm run dev` error setelah `git pull`
 
