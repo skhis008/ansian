@@ -1,0 +1,45 @@
+{
+  "name": "antar-jemput",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Frontend antar jemput (ride hailing) - Nuxt 4, siap dihubungkan ke Laravel backend",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^1.0.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vueuse/nuxt": "^15.0.0",
+    "echarts": "^6.1.0",
+    "laravel-echo": "^2.5.0",
+    "leaflet": "^1.9.4",
+    "nuxt": "^4.5.2",
+    "pinia": "^4.0.3",
+    "pusher-js": "^8.6.0",
+    "tailwindcss": "^4.3.3",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^26.6.3",
+    "typescript": "^5.9.0",
+    "vue-tsc": "^3.1.0"
+  },
+  "packageManager": "npm@11.19.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
