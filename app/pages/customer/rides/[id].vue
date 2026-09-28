@@ -29,8 +29,8 @@ const PAYMENT_LABEL: Record<string, string> = {
 
 async function openChat() {
   if (!ride.value) return
-  await chat.openConversation(ride.value.ride_code)
-  await navigateTo('/customer/chat')
+  const conv = await chat.openConversation(ride.value.ride_code)
+  await navigateTo(conv ? `/customer/chat/${conv.id}` : '/customer/chat')
 }
 
 async function submitRating(payload: { score: number; comment: string | null; tags: string[] }) {
