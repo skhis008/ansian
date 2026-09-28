@@ -17,7 +17,7 @@ const props = withDefaults(
     fitToRoute?: boolean
   }>(),
   {
-    center: () => ({ lat: -6.208763, lng: 106.8456 }),
+    center: () => ({ lat: -6.982835, lng: 110.409352 }),
     zoom: 13,
     pickup: null,
     destination: null,

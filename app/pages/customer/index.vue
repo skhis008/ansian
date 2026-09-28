@@ -10,36 +10,34 @@ const chat = useChatStore()
 
 useSeoMeta({ title: 'Beranda', robots: 'noindex, nofollow' })
 
-const { data: summary } = await useAsyncData('rider-summary', () =>
+const { data: summary } = await useAsyncData('customer-summary', () =>
   http.get<{ data: any }>('/me/summary').then(r => r.data),
 )
 
-const { data: activity } = await useAsyncData('rider-activity', () =>
+const { data: activity } = await useAsyncData('customer-activity', () =>
   http.get<{ data: any[] }>('/me/activity').then(r => r.data),
 )
 
-const { data: active } = await useAsyncData('rider-active', async () => {
+const { data: active } = await useAsyncData('customer-active', async () => {
   const r = await http.get<{ data: any }>('/rides/active')
   rideStore.setActive(r.data)
   return r.data
 })
 
 function copyPromo() {
-  navigator.clipboard?.writeText('AJHEMAT30')
+  navigator.clipboard?.writeText('ANSIAN30')
   useToast().success('Kode promo disalin!')
 }
 
 const quickActions = [
-  { label: 'Motor', desc: 'Mulai dari Rp8.000', icon: 'bike', to: '/rider/book?type=motorcycle', tone: 'bg-brand-50 text-brand-600' },
-  { label: 'Mobil', desc: 'Mulai dari Rp45.000', icon: 'car', to: '/rider/book?type=car', tone: 'bg-emerald-50 text-emerald-600' },
-  { label: 'Kirim Barang', desc: 'Paket & dokumen', icon: 'package', to: '/rider/book?type=parcel', tone: 'bg-amber-50 text-amber-600' },
-  { label: 'Riwayat', desc: 'Lihat perjalanan', icon: 'history', to: '/rider/rides', tone: 'bg-violet-50 text-violet-600' },
+  { label: 'Motor', desc: 'Mulai Rp4.000', icon: 'bike', to: '/customer/book', tone: 'bg-brand-50 text-brand-600' },
+  { label: 'Kirim Barang', desc: 'Paket & dokumen', icon: 'package', to: '/customer/book', tone: 'bg-amber-50 text-amber-600' },
+  { label: 'Riwayat', desc: 'Lihat perjalanan', icon: 'history', to: '/customer/rides', tone: 'bg-violet-50 text-violet-600' },
 ]
 
 const stats = computed(() => [
   { label: 'Perjalanan', value: summary.value?.total_rides ?? 0, icon: 'navigation', tone: 'text-brand-600 bg-brand-50' },
   { label: 'Total transaksi', value: formatRupiah(summary.value?.total_spent ?? 0), icon: 'wallet', tone: 'text-emerald-600 bg-emerald-50' },
-  { label: 'Saldo dompet', value: formatRupiah(summary.value?.wallet_balance ?? 0), icon: 'credit-card', tone: 'text-amber-600 bg-amber-50' },
   { label: 'Poin', value: (summary.value?.points ?? 0).toLocaleString('id-ID'), icon: 'gift', tone: 'text-violet-600 bg-violet-50' },
 ])
 </script>
@@ -54,7 +52,7 @@ const stats = computed(() => [
     >
       <NuxtLink
         v-if="active"
-        to="/rider/active"
+        to="/customer/active"
         class="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-700 p-4 text-white shadow-lift transition hover:from-brand-700 hover:to-brand-800"
       >
         <span class="relative grid size-11 shrink-0 place-items-center rounded-xl bg-white/15">
@@ -80,7 +78,7 @@ const stats = computed(() => [
     </div>
 
     <!-- Quick actions -->
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
       <NuxtLink
         v-for="a in quickActions"
         :key="a.label"
@@ -96,7 +94,7 @@ const stats = computed(() => [
     </div>
 
     <!-- Stats -->
-    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
       <UiCard v-for="s in stats" :key="s.label" class="flex items-center gap-3">
         <span class="grid size-10 shrink-0 place-items-center rounded-xl" :class="s.tone">
           <UiIcon :name="s.icon" class="size-5" />
@@ -113,7 +111,7 @@ const stats = computed(() => [
       <div class="lg:col-span-2">
         <AppPageHeader title="Aktivitas Terakhir">
           <template #actions>
-            <UiButton to="/rider/rides" variant="ghost" size="sm">
+            <UiButton to="/customer/rides" variant="ghost" size="sm">
               Lihat semua
               <template #icon><UiIcon name="chevron-right" class="size-4" /></template>
             </UiButton>
@@ -128,7 +126,7 @@ const stats = computed(() => [
           <NuxtLink
             v-for="a in activity.slice(0, 5)"
             :key="a.id"
-            :to="`/rider/rides/${a.id}`"
+            :to="`/customer/rides/${a.id}`"
             class="flex items-center gap-3 rounded-2xl border border-ink-200/80 bg-white p-3.5 transition hover:border-brand-300 hover:shadow-soft"
           >
             <span
@@ -159,7 +157,7 @@ const stats = computed(() => [
             <p class="mt-3 text-lg font-bold">Diskon 30%</p>
             <p class="mt-1 text-sm text-white/70">Untuk 3 perjalanan berikutnya</p>
             <div class="mt-4 flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2">
-              <code class="flex-1 font-mono text-sm font-bold tracking-wider">AJHEMAT30</code>
+              <code class="flex-1 font-mono text-sm font-bold tracking-wider">ANSIAN30</code>
               <button type="button" class="text-white/70 transition hover:text-white" @click="copyPromo">
                 <UiIcon name="copy" class="size-4" />
               </button>
@@ -170,7 +168,7 @@ const stats = computed(() => [
         <UiCard>
           <h3 class="text-sm font-bold text-ink-900">Butuh bantuan?</h3>
           <p class="mt-1 text-xs text-ink-500">Tim kami siap 24/7</p>
-          <UiButton to="/rider/chat" variant="outline" size="sm" block class="mt-4">
+          <UiButton to="/customer/chat" variant="outline" size="sm" block class="mt-4">
             <template #icon><UiIcon name="message-circle" class="size-4" /></template>
             Chat Customer Service
           </UiButton>
@@ -185,7 +183,7 @@ const stats = computed(() => [
               <p class="text-sm font-semibold text-ink-900">{{ chat.totalUnread }} pesan belum dibaca</p>
               <p class="text-[11px] text-ink-500">Lihat percakapan terbaru</p>
             </div>
-            <UiButton to="/rider/chat" variant="ghost" size="sm" icon-only>
+            <UiButton to="/customer/chat" variant="ghost" size="sm" icon-only>
               <template #icon><UiIcon name="chevron-right" class="size-4" /></template>
             </UiButton>
           </div>

@@ -37,8 +37,6 @@ const maxVehicle = computed(() => Math.max(1, ...(data.value?.by_vehicle ?? []).
 
 const VEHICLE_ICONS: Record<VehicleType, string> = {
   motorcycle: 'bike',
-  car: 'car',
-  van: 'package',
 }
 
 const fmtHours = (min: number) => `${(min / 60).toFixed(1)} jam`
@@ -54,7 +52,7 @@ const exportCsv = () => {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `laporan-antarjemput-${range.value}-hari.csv`
+  a.download = `laporan-ansian-${range.value}-hari.csv`
   a.click()
   URL.revokeObjectURL(url)
 }

@@ -25,15 +25,12 @@ useSeoMeta({
 const PAYMENT_LABEL: Record<string, string> = {
   cash: 'Tunai',
   qris: 'QRIS',
-  midtrans: 'Midtrans',
-  xendit: 'Xendit',
-  wallet: 'Dompet',
 }
 
 async function openChat() {
   if (!ride.value) return
   await chat.openConversation(ride.value.ride_code)
-  await navigateTo('/rider/chat')
+  await navigateTo('/customer/chat')
 }
 
 async function submitRating(payload: { score: number; comment: string | null; tags: string[] }) {
@@ -51,7 +48,7 @@ async function submitRating(payload: { score: number; comment: string | null; ta
 
 <template>
   <div class="space-y-5">
-    <NuxtLink to="/rider/rides" class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-600 hover:text-ink-900">
+    <NuxtLink to="/customer/rides" class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-600 hover:text-ink-900">
       <UiIcon name="arrow-left" class="size-4" />
       Kembali ke riwayat
     </NuxtLink>
@@ -67,7 +64,7 @@ async function submitRating(payload: { score: number; comment: string | null; ta
         title="Perjalanan tidak ditemukan"
         description="Data perjalanan mungkin sudah tidak tersedia."
       >
-        <UiButton to="/rider/rides">Kembali</UiButton>
+        <UiButton to="/customer/rides">Kembali</UiButton>
       </AppEmptyState>
     </div>
 
@@ -147,12 +144,6 @@ async function submitRating(payload: { score: number; comment: string | null; ta
                 <dt class="text-[10px] text-ink-400 uppercase">Durasi</dt>
                 <dd class="mt-0.5 text-sm font-bold text-ink-900">{{ ride.duration_min }} mnt</dd>
               </div>
-              <div>
-                <dt class="text-[10px] text-ink-400 uppercase">Lonjakan</dt>
-                <dd class="mt-0.5 text-sm font-bold" :class="ride.surge_multiplier > 1 ? 'text-amber-600' : 'text-ink-900'">
-                  {{ ride.surge_multiplier }}×
-                </dd>
-              </div>
             </dl>
           </UiCard>
 
@@ -205,7 +196,7 @@ async function submitRating(payload: { score: number; comment: string | null; ta
 
             <UiButton
               v-if="ride.payment_status === 'unpaid' && ride.payment_method !== 'cash'"
-              :to="`/rider/checkout/${ride.id}`"
+              :to="`/customer/checkout/${ride.id}`"
               size="sm"
               block
               class="mt-4"

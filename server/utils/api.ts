@@ -1,12 +1,19 @@
 import { createError, getCookie, setCookie, deleteCookie, getQuery, readBody, type H3Event } from 'h3'
 import type { Paginated, User } from '#shared/types'
-import { db, userById } from '#shared/mocks/db'
+import { db, userById } from './mockApi/db'
 
-export const SESSION_COOKIE = 'aj_session'
+export const SESSION_COOKIE = 'ans_session'
+/** Cookie kepercayaan perangkat: lewati OTP 30 hari (mirip trust device Laravel) */
+export const DEVICE_COOKIE = 'ans_device'
 
 export interface Session {
   userId: number
   token: string
+}
+
+export interface DeviceTrust {
+  userId: number
+  trusted_at: string
 }
 
 /* ---------------- Session (mock Laravel session / Sanctum) ---------------- */
@@ -34,6 +41,27 @@ export function writeSession(event: H3Event, session: Session) {
 
 export function clearAuthSession(event: H3Event) {
   deleteCookie(event, SESSION_COOKIE, { path: '/' })
+}
+
+export function readDevice(event: H3Event): DeviceTrust | null {
+  const raw = getCookie(event, DEVICE_COOKIE)
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw) as DeviceTrust
+    if (typeof parsed.userId === 'number' && parsed.trusted_at) return parsed
+  } catch {
+    /* ignore */
+  }
+  return null
+}
+
+export function trustDevice(event: H3Event, userId: number) {
+  setCookie(event, DEVICE_COOKIE, JSON.stringify({ userId, trusted_at: new Date().toISOString() }), {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 30,
+  })
 }
 
 /** Equivalent to Laravel $request->user() via auth:sanctum middleware */

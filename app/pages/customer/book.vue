@@ -23,11 +23,8 @@ const swapPoints = ref(false)
 let routeController: AbortController | null = null
 
 const METHODS: { value: PaymentMethod; label: string; desc: string; icon: string; tone: string }[] = [
-  { value: 'cash', label: 'Tunai', desc: 'Bayar di kendaraan', icon: 'wallet', tone: 'text-emerald-600' },
-  { value: 'qris', label: 'QRIS', desc: 'Scan di aplikasi', icon: 'inbox', tone: 'text-ink-800' },
-  { value: 'midtrans', label: 'Midtrans', desc: 'VA, e-wallet, kartu', icon: 'credit-card', tone: 'text-blue-600' },
-  { value: 'xendit', label: 'Xendit', desc: 'OVO, DANA, ShopeePay', icon: 'zap', tone: 'text-violet-600' },
-  { value: 'wallet', label: 'Dompet', desc: 'Saldo Rp185.000', icon: 'briefcase', tone: 'text-amber-600' },
+  { value: 'cash', label: 'Tunai', desc: 'Bayar ke driver', icon: 'wallet', tone: 'text-emerald-600' },
+  { value: 'qris', label: 'QRIS', desc: 'Semua e-wallet & m-banking', icon: 'inbox', tone: 'text-ink-800' },
 ]
 
 const ready = computed(() => Boolean(pickup.value && destination.value))
@@ -67,7 +64,7 @@ async function book() {
       scheduled_at: scheduled.value ? scheduledAt.value : null,
     })
     toast.success('Mencari driver terdekat…')
-    await router.push(`/rider/active?id=${ride.id}`)
+    await router.push(`/customer/active?id=${ride.id}`)
   } catch (e) {
     toast.error(e instanceof Error ? e.message : 'Gagal memesan.')
   }
@@ -114,7 +111,7 @@ void pathSummary
         <p class="text-sm font-semibold text-amber-900">Kamu punya perjalanan yang sedang berjalan</p>
         <p class="mt-0.5 text-xs text-amber-700">Selesaikan atau batalkan dulu sebelum memesan lagi.</p>
       </div>
-      <UiButton to="/rider/active" size="sm" variant="outline">Lihat</UiButton>
+      <UiButton to="/customer/active" size="sm" variant="outline">Lihat</UiButton>
     </div>
 
     <div class="grid gap-5 lg:grid-cols-5">
@@ -200,7 +197,7 @@ void pathSummary
         <RideFareSummary
           :quote="rideStore.quote"
           :loading="rideStore.quoting"
-          note="Harga final dapat berubah mengikuti kondisi lalu lintas."
+          note="Tarif zona sesuai jarak — tanpa biaya tersembunyi."
         />
 
         <UiCard>

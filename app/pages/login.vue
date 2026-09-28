@@ -6,7 +6,7 @@ definePageMeta({ layout: 'auth' })
 
 useSeoMeta({
   title: 'Masuk',
-  description: 'Masuk ke akun {{ $config.public.appName }} untuk memesan antar jemput atau mengantar penumpang sebagai driver.',
+  description: 'Masuk ke akun {{ $config.public.appName }} untuk memesan antar jemput atau mengantar pelanggan sebagai driver.',
   robots: 'noindex, follow',
 })
 
@@ -20,9 +20,9 @@ const serverError = ref('')
 const showPassword = ref(false)
 
 const demoAccounts = [
-  { role: 'Rider', email: 'rider@antarjemput.id', password: 'password', icon: 'user', tone: 'bg-brand-50 text-brand-600' },
-  { role: 'Driver', email: 'driver@antarjemput.id', password: 'password', icon: 'car', tone: 'bg-emerald-50 text-emerald-600' },
-  { role: 'Admin', email: 'admin@antarjemput.id', password: 'admin123', icon: 'shield', tone: 'bg-violet-50 text-violet-600' },
+  { role: 'Pelanggan', email: 'customer@ansian.id', password: 'password', icon: 'user', tone: 'bg-brand-50 text-brand-600' },
+  { role: 'Driver', email: 'driver@ansian.id', password: 'password', icon: 'bike', tone: 'bg-emerald-50 text-emerald-600' },
+  { role: 'Admin', email: 'admin@ansian.id', password: 'admin123', icon: 'shield', tone: 'bg-violet-50 text-violet-600' },
 ]
 
 function fill(account: (typeof demoAccounts)[number]) {
@@ -42,6 +42,12 @@ async function submit() {
 
   try {
     const user = await auth.login(form.email, form.password, form.remember)
+    if (!user) {
+      /* Perlu OTP — lanjut ke halaman verifikasi */
+      const redirect = route.query.redirect
+      await navigateTo({ path: '/verifikasi', query: typeof redirect === 'string' ? { redirect } : {} })
+      return
+    }
     toast.success(`Selamat datang, ${user.name.split(' ')[0]}!`)
     const redirect = route.query.redirect
     await navigateTo(typeof redirect === 'string' && redirect.startsWith('/') ? redirect : auth.homePath)

@@ -3,6 +3,7 @@ const auth = useAuthStore()
 const open = ref(false)
 const links = [
   { label: 'Cara Kerja', to: '/#cara-kerja' },
+  { label: 'Harga', to: '/#harga' },
   { label: 'Fitur', to: '/#fitur' },
   { label: 'FAQ', to: '/faq' },
   { label: 'Tentang', to: '/tentang' },

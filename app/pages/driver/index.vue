@@ -94,6 +94,32 @@ const stats = computed(() => [
 
 <template>
   <div class="space-y-5">
+    <!-- Banner verifikasi mahasiswa -->
+    <div
+      v-if="auth.driver && auth.driver.verification !== 'verified'"
+      class="flex items-start gap-3 rounded-2xl border px-4 py-3.5"
+      :class="auth.driver.verification === 'rejected'
+        ? 'border-red-200 bg-red-50'
+        : 'border-amber-200 bg-amber-50'"
+    >
+      <UiIcon
+        name="graduation-cap"
+        class="mt-0.5 size-5 shrink-0"
+        :class="auth.driver.verification === 'rejected' ? 'text-red-600' : 'text-amber-600'"
+      />
+      <div class="flex-1">
+        <p class="text-sm font-bold" :class="auth.driver.verification === 'rejected' ? 'text-red-900' : 'text-amber-900'">
+          {{ auth.driver.verification === 'rejected' ? 'Verifikasi ditolak' : 'Menunggu verifikasi admin' }}
+        </p>
+        <p class="mt-0.5 text-xs" :class="auth.driver.verification === 'rejected' ? 'text-red-700' : 'text-amber-700'">
+          {{ auth.driver.verification === 'rejected'
+            ? 'Data NIM/kampus perlu diperbaiki. Hubungi customer service.'
+            : `NIM ${auth.driver.student_id || '-'} · ${auth.driver.campus || '-'} sedang ditinjau. Kamu tetap bisa cek aktivitas.` }}
+        </p>
+      </div>
+      <UiButton to="/driver/profile" size="sm" variant="outline">Lihat Data</UiButton>
+    </div>
+
     <!-- Status toggle -->
     <div
       class="rounded-2xl p-5 text-white shadow-lift transition"

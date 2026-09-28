@@ -38,7 +38,7 @@ type AdminActivity = {
   ride_code: string
   status: RideStatus
   fare: number
-  rider_name: string
+  customer_name: string
   driver_name: string
   created_at: string
 }
@@ -100,7 +100,7 @@ const TONES: Record<string, string> = {
 
 <template>
   <div class="space-y-5">
-    <AppPageHeader title="Dashboard" description="Ringkasan operasional AntarJemput hari ini.">
+    <AppPageHeader title="Dashboard" description="Ringkasan operasional Ansian hari ini.">
       <template #actions>
         <select
           v-model.number="range"
@@ -211,7 +211,7 @@ const TONES: Record<string, string> = {
             <thead>
               <tr class="border-b border-ink-100 text-[11px] tracking-wide text-ink-400 uppercase">
                 <th class="px-5 py-2.5 font-semibold">Kode</th>
-                <th class="px-3 py-2.5 font-semibold">Penumpang</th>
+                <th class="px-3 py-2.5 font-semibold">Pelanggan</th>
                 <th class="px-3 py-2.5 font-semibold">Driver</th>
                 <th class="px-3 py-2.5 font-semibold">Status</th>
                 <th class="px-3 py-2.5 text-right font-semibold">Tarif</th>
@@ -221,7 +221,7 @@ const TONES: Record<string, string> = {
             <tbody>
               <tr v-for="a in activity ?? []" :key="a.id" class="border-b border-ink-50 last:border-0">
                 <td class="px-5 py-2.5 font-mono text-[12px] text-ink-700">{{ a.ride_code }}</td>
-                <td class="max-w-[10rem] truncate px-3 py-2.5 text-[12.5px] text-ink-700">{{ a.rider_name }}</td>
+                <td class="max-w-[10rem] truncate px-3 py-2.5 text-[12.5px] text-ink-700">{{ a.customer_name }}</td>
                 <td class="max-w-[10rem] truncate px-3 py-2.5 text-[12.5px] text-ink-500">{{ a.driver_name }}</td>
                 <td class="px-3 py-2.5">
                   <RideStatusBadge :status="a.status" size="sm" />

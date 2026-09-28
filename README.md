@@ -1,20 +1,24 @@
-# Ajem-UDINUS-FE
+# Ansian — Antar Jemput Dinusian
 
-Frontend **AntarJemput** — aplikasi ride hailing (Nuxt 4 + Vue 3 + TypeScript + Tailwind CSS 4).
+Frontend **Ansian (Antar Jemput Dinusian)** — layanan antar jemput berbasis motor kawasan Udinus/Semarang.
+Nuxt 4 + Vue 3 + TypeScript + Tailwind CSS 4.
 
 > **Repo ini dipakai bareng, bukan sendirian.**
 > Kalau kamu anggota tim: baca **[Kolaborasi](#kolaborasi--untuk-anggota-tim)** dulu,
 > terutama bagian [Sebelum Ngoding](#sebelum-ngoding-wajib), sebelum mulai ngoding.
 
+Dua pilar produk:
+
+1. **Tarif lebih terjangkau & transparan** — zona jarak (hijau/kuning/jingga/merah), tanpa surge, tanpa biaya tersembunyi.
+2. **Lowongan kerja sampingan bagi mahasiswa** — driver khusus mahasiswa (NIM + kampus, diverifikasi admin).
+
 ## Fitur
 
-- **Rider** — pemesanan perjalanan, pelacakan driver di peta, chat, checkout, riwayat perjalanan, pembayaran
-- **Driver** — kelola permintaan, perjalanan aktif, chat, pendapatan, profil
-- **Admin** — dashboard, manajemen driver/rider, perjalanan, transaksi, laporan, pengaturan
-- **Realtime** — Laravel Echo + Pusher (Reverb/Soketi)
-- **Peta** — Leaflet + OpenStreetMap
-- **Chart** — ECharts
-- **State** — Pinia
+- **Pelanggan** — pesan perjalanan (motor), kirim barang, peta, chat, checkout **Tunai/QRIS**, riwayat, verifikasi kode email (OTP)
+- **Driver (mahasiswa)** — pendaftaran via `/driver/daftar` (NIM, kampus, prodi), banner status verifikasi, permintaan order, pendapatan, profil kendaraan
+- **Admin** — dashboard, verifikasi driver, pengguna, perjalanan, transaksi (termasuk **Tandai Lunas**), laporan, pengaturan zona tarif
+- **Peta** — Leaflet + OpenStreetMap (pusat default: Kampus Udinus `-6.982835, 110.4093524`)
+- **State** — Pinia · **Chart** — komponen chart internal (tanpa ECharts)
 
 ## Stack
 
@@ -24,8 +28,7 @@ Frontend **AntarJemput** — aplikasi ride hailing (Nuxt 4 + Vue 3 + TypeScript 
 | Styling | Tailwind CSS 4 |
 | State | Pinia |
 | Maps | Leaflet + OpenStreetMap |
-| Charts | ECharts |
-| Realtime | Laravel Echo + Pusher |
+| Realtime | Laravel Echo + Pusher/Reverb (opsional) |
 | Backend | Laravel (`CUKLIZ/Ajem-UDINUS-BE`) |
 
 ## Menjalankan
@@ -33,17 +36,21 @@ Frontend **AntarJemput** — aplikasi ride hailing (Nuxt 4 + Vue 3 + TypeScript 
 Prasyarat: **Node.js >= 20.19.0** (lihat `package.json` → `engines`).
 
 ```bash
-npm install     # atau `npm ci` kalau ikut lockfile persis
-npm run dev
+npm install        # atau `npm ci` kalau ikut lockfile persis
+npm run dev        # http://localhost:3000
+npm run typecheck  # vue-tsc
+npm run lint       # ESLint (flat config via @nuxt/eslint)
+npm run build && npm run preview
 ```
 
-Server berjalan di http://localhost:3000 — **dari device lain / HP** perlu ekspos network:
+Server default hanya bind ke `localhost` — **dari HP / device lain** perlu ekspos network:
 
 ```bash
 npm run dev -- --host
 ```
 
-Secara default `npm run dev` hanya bind ke `localhost` (IPv6), jadi `127.0.0.1:3000` **tidak** bisa diakses. Selalu pakai `--host` kalau mau dibuka dari HP atau diproxy Apache.
+> Catatan environment Termux: file bin `node_modules` dengan shebang `#!/usr/bin/env node`
+> perlu di-patch bila `/usr/bin/env` tidak ada (`sed -i "1s|.*|#!$(which node)|" <file>`).
 
 ### Login demo
 
@@ -51,9 +58,13 @@ Default app memakai mock API bawaan, jadi bisa langsung login tanpa backend:
 
 | Role | Email | Password |
 | --- | --- | --- |
-| Rider | `rider@antarjemput.id` | `password` |
-| Driver | `driver@antarjemput.id` | `password` |
-| Admin | `admin@antarjemput.id` | `admin123` |
+| Pelanggan | `customer@ansian.id` | `password` |
+| Driver | `driver@ansian.id` | `password` |
+| Admin | `admin@ansian.id` | `admin123` |
+
+Login/registrasi meminta **kode OTP 6 digit** (mode mock: kode tampil di layar sebagai `dev_code`,
+produksi Laravel mengirim via email). Perangkat yang lolos OTP diberi cookie `ans_device` (percaya 30 hari),
+sehingga login berikutnya cukup password.
 
 ---
 
@@ -136,7 +147,7 @@ git push -u origin feature/chat-realtime
 | `docs/` | dokumentasi |
 | `chore/` | tooling, config, dependency |
 
-Contoh: `feature/rider-pagination`, `fix/leaflet-marker-abnormal`, `docs/tambah-tabel-api`.
+Contoh: `feature/customer-pagination`, `fix/leaflet-marker-abnormal`, `docs/tambah-tabel-api`.
 
 ### Setelah PR di-merge
 
@@ -181,7 +192,7 @@ git config --get credential.helper    # harus ada isinya, kalau kosong berarti b
 
 **Cara 2 — Personal Access Token (kalau tidak pakai `gh`)**
 
-Buat token di GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained token**, beri akses repo `Ajem-UDINUS-FE` (Contents: Read & write). Lalu saat `git push` ditanya password, **paste token itu** di kolom password (username tetap `CUKLIZ`).
+Buat token di GitHub → Settings → Developer settings → Personal access tokens → **Classic token** (centang scope `repo`), atau fine-grained token dengan akses repo ini (Contents: Read & write). Lalu saat `git push` ditanya password, **paste token itu** di kolom password.
 
 ### C. Push
 
@@ -192,8 +203,6 @@ git push -u origin feature/nama-fitur
 # Push berikutnya di branch yang sama
 git push
 ```
-
-Kalau `git push` ditanya **username/password** padahal `gh auth setup-git` sudah dijalankan, jalankan `gh auth status` — kemungkinan besar token-nya kedaluwarsa, `gh auth refresh` untuk perbarui.
 
 ### D. Kalau `credential.helper` belum di-set
 
@@ -213,7 +222,7 @@ git -c credential.helper= -c credential.helper='!gh auth git-credential' push
 
 ## Aturan Commit
 
-Pakai **Conventional Commits** — facilitates buat review dan generate changelog:
+Pakai **Conventional Commits** — memudahkan review dan generate changelog:
 
 ```
 <type>(<scope>): <deskripsi singkat>
@@ -235,7 +244,7 @@ Scope yang umum dipakai: `chat`, `ride`, `driver`, `auth`, `admin`, `map`, `pay`
 Contoh:
 
 ```
-feat(ride): tambah pagination di riwayat perjalanan rider
+feat(ride): tambah pagination di riwayat perjalanan pelanggan
 fix(auth): session hilang setelah hard refresh
 refactor(ui): pecah RideCard jadi komponen kecil
 docs(api): lengkapi tabel endpoint
@@ -270,9 +279,10 @@ npm run build      # build produksi  -> .output/
 npm run preview    # preview hasil build
 npm run generate   # static generate (caveat: lihat di bawah)
 ```
+
 ### Catatan penting soal production
 
-App ini **bukan situs statis** — ada SSR (`routeRules` → `ssr: true` untuk `/rider/**`, `/driver/**`, `/admin/**`) dan ada Nitro server routes (`server/routes/api/v1/`). Jadi:
+App ini **bukan situs statis** — ada SSR (`routeRules` → `ssr: true` untuk `/customer/**`, `/driver/**`, `/admin/**`) dan ada Nitro server routes (`server/routes/api/v1/`). Jadi:
 
 - **Jangan** menaruh hasil build langsung di document root Apache (`/srv/httpd`) dan berharap route-nya jalan. Yang kepake cuma aset statis, SSR dan API-nya mati.
 - `.output/` **harus dijalankan pakai Node**:
@@ -284,28 +294,146 @@ App ini **bukan situs statis** — ada SSR (`routeRules` → `ssr: true` untuk `
   ```
 
   Untuk production, jalankan pakai **pm2** atau **systemd** supaya auto-restart, lalu set **Apache sebagai reverse proxy** ke `127.0.0.1:3000`. Itupun bukan "menaruh file di `/srv/httpd`" — httpd cuma proxy, file-nya tetap milik proses Node.
-- `npm run generate` (fully static) **tidak disarankan** untuk app ini: halaman `/rider`, `/driver`, `/admin` jadi hollow shell tanpa SSR, dan mock API mati. Kalau memang harus, wajib `NUXT_PUBLIC_USE_MOCK=false` + arahkan ke backend Laravel.
+- `npm run generate` (fully static) **tidak disarankan** untuk app ini: halaman `/customer`, `/driver`, `/admin` jadi hollow shell tanpa SSR, dan mock API mati. Kalau memang harus, wajib `NUXT_PUBLIC_USE_MOCK=false` + arahkan ke backend Laravel.
 
 ---
 
 ## Environment
 
-Salin `.env.example` menjadi `.env` lalu sesuaikan. Konfigurasi diambil dari `runtimeConfig` (`nuxt.config.ts`):
+Salin `.env.example` menjadi `.env` lalu sesuaikan (`nuxt.config.ts → runtimeConfig`):
 
 | Variabel | Default | Keterangan |
 | --- | --- | --- |
 | `NUXT_PUBLIC_API_BASE` | `http://localhost:8000` | Base URL Laravel backend |
 | `NUXT_PUBLIC_USE_MOCK` | `true` | `true` = mock API bawaan, `false` = panggil Laravel |
 | `NUXT_PUBLIC_APP_URL` | `http://localhost:3000` | URL aplikasi |
-| `NUXT_PUBLIC_REALTIME_ENABLED` | `false` | Aktifkan koneksi realtime |
-| `NUXT_PUBLIC_REALTIME_KEY` | - | App key Pusher/Reverb |
-| `NUXT_PUBLIC_REALTIME_HOST` | `localhost` | Host websocket |
-| `NUXT_PUBLIC_REALTIME_PORT` | `8080` | Port websocket |
-| `NUXT_PUBLIC_REALTIME_WSS_PORT` | `8081` | Port WSS |
-| `NUXT_PUBLIC_REALTIME_TLS` | `false` | Force TLS |
-| `NUXT_PUBLIC_REALTIME_CLUSTER` | `mt1` | Cluster Pusher |
+| `NUXT_PUBLIC_REALTIME_*` | - | Konfigurasi Pusher/Reverb (opsional) |
 
 **`.env` jangan pernah di-commit** — sudah ke-ignore, tapi tetap hati-hati saat `git add`.
+
+---
+
+## Kontrak API
+
+Semua panggilan frontend lewat `/api/v1/...`, yang **sama persis dengan path + method di `routes/api.php` Laravel**. Kalau backend aktif: set `NUXT_PUBLIC_USE_MOCK=false`, lalu file mock (`server/utils/mockApi/`) boleh dihapus **tanpa mengubah kode frontend**.
+
+Endpoint yang ter-cover (semua di `server/utils/apiRouter.ts`):
+
+| Group | Endpoint |
+| --- | --- |
+| Auth | `register`, `login`, `logout`, `me`, `profile`, `password`, `sessions` |
+| OTP | `auth/otp/verify`, `auth/otp/resend` |
+| Me | `me/summary`, `me/activity` |
+| Rides | `rides`, `rides/:id`, `rides/:id/route`, `rides/:id/cancel`, `rides/:id/rate`, `rides/:id/timeline`, `rides/active` |
+| Fare | `fares/quote` |
+| Driver | `drivers`, `drivers/nearby`, `drivers/me`, `drivers/me/status`, `drivers/me/location`, `drivers/me/earnings`, `drivers/jobs`, `drivers/jobs/:ride/accept`, `drivers/jobs/:ride/reject`, `drivers/rides/:ride/arrive\|start\|complete` |
+| Chat | `conversations`, `conversations/:id`, `messages/:conversation`, `conversations/:id/messages`, `conversations/:id/read` |
+| Notification | `notifications`, `notifications/read-all`, `notifications/:id/read` |
+| Payment | `payments`, `payments/qris`, `payments/webhook` |
+| Admin | `stats`, `activity`, `charts/*`, `top-drivers`, `users`, `rides`, `payments`, `reports`, `settings`, `drivers/:driver/verify` |
+
+Tambah endpoint baru? Update di **dua tempat**: `server/utils/apiRouter.ts` (mock) dan `Ajem-UDINUS-BE/routes/api.php` (Laravel). Kalau cuma salah satu, frontend bakal tidak sinkron dengan backend.
+
+---
+
+## Kontrak Backend (untuk tim Laravel)
+
+Frontend berjalan mandiri dengan mock API di `server/utils/mockApi/*` yang **meniru 1:1 `routes/api.php`**.
+Saat backend aktif: set `NUXT_PUBLIC_USE_MOCK=false` — file mock boleh dihapus tanpa mengubah kode frontend.
+Perubahan kontrak terhadap versi lama tercatat di bawah.
+
+### 1. Naming & role
+
+| Lama | Baru |
+| --- | --- |
+| route `/rider/*`, role `rider` | route **`/customer/*`**, role **`customer`** |
+| field `rider_id`, `rider_name`, `rider_rating` | **`customer_id`**, **`customer_name`**, **`customer_rating`** |
+| cookie `aj_session` | **`ans_session`** |
+| token mock `aj_mock_*` | **`ans_mock_*`** |
+| kode trip `AJ-…` | **`ASN-…`** |
+| promo `AJHEMAT30` | **`ANSIAN30`** |
+| cancel reason `rider_cancel` | **`customer_cancel`** |
+| kendaraan `motorcycle/car/van` | **`motorcycle` saja** |
+| pembayaran `cash/qris/midtrans/xendit/wallet` | **`cash` + `qris` saja** (tanpa gateway/`checkout_url`) |
+
+### 2. Auth + OTP (endpoint baru/berubah)
+
+- `POST /auth/register` → **tidak mengembalikan sesi**. Balas:
+  `{ challenge_id, email_masked, expires_in: 300, dev_code? }` (status 200).
+  Field driver: **`student_id` (NIM), `campus`, `study_program?`, `vehicle_plate/color/model?`** — wajib `student_id`+`campus`.
+- `POST /auth/login` → cek password:
+  - cookie **`ans_device`** cocok (userId, 30 hari) → sesi normal `{ token, user }`
+  - selain itu → **challenge OTP** (format sama dengan register)
+- `POST /auth/otp/verify` `{ challenge_id, code }` → `{ token, user }`
+  - kode 6 digit, TTL 300 detik, maks 5 percobaan, salah → 422 + sisa percobaan
+  - sukses → set `email_verified_at` (purpose register), set cookie `ans_device` (30 hari), buat sesi
+- `POST /auth/otp/resend` `{ challenge_id }` → challenge baru; throttle 60 detik (429)
+
+### 3. Tarif zona (satu sumber kebenaran: `shared/utils/pricing.ts`)
+
+`POST /fares/quote { pickup, destination }` →
+
+```jsonc
+{
+  "zone": "green|yellow|orange|red",
+  "zone_label": "Zona Hijau", "zone_color": "#16a34a",
+  "distance_km": 1.92, "duration_min": 4,
+  "zone_fare": 4000, "admin_fee": 500, "total": 4500,
+  "currency": "IDR", "route": [...], "nearest_drivers": 5
+}
+```
+
+Rumus (WAJIB sama persis di backend, **tanpa surge/biaya layanan**):
+
+| Zona | Jarak | Tarif zona | Admin |
+| --- | --- | --- | --- |
+| Hijau | 0 – 2,5 km | tetap Rp4.000 | Rp500 |
+| Kuning | 2,5 – 6,5 km | lurus Rp5.000@3km → Rp15.000@6km (clamp) | Rp500 |
+| Jingga | 6,5 – 10,5 km | lurus Rp16.000@7km → Rp20.000@10km (clamp) | Rp1.000 |
+| Merah | ≥ 10,5 km | Rp20.000 + max(0, km−11) × Rp1.500 | Rp1.000 |
+
+`total = zone_fare + admin_fee`, pembulatan kelipatan Rp100.
+
+### 4. Pembayaran (tanpa gateway)
+
+- `GET /payments/qris` → `{ image_url, merchant_name, enabled, instructions[] }` — QR statis dari backend
+- `POST /payments { ride_id, method: 'cash'|'qris' }` → `Payment` (tanpa `gateway`, tanpa `checkout_url`);
+  cash → `unpaid`, qris → `pending`
+- `POST /payments/{payment}/webhook` (atau `/payments/webhook`) body `{ reference, transaction_status }`
+  → konfirmasi `settlement`/`success` → `paid`. Dipakai ulang sebagai aksi admin **"Tandai Lunas"**
+- `POST /rides` menerima `payment_method: 'cash'|'qris'` saja (422 untuk selain itu)
+
+### 5. Driver mahasiswa
+
+`DriverProfile` bertambah:
+
+```ts
+student_id: string      // NIM
+campus: string
+study_program: string
+verification: 'pending' | 'verified' | 'rejected'
+```
+
+- `GET /admin/stats` → field `riders` diganti **`customers`**; `pending_drivers` = jumlah profil berstatus `pending`
+- `POST /admin/drivers/{driver}/verify` `{ verification }` → ubah status verifikasi (endpoint baru)
+- `PATCH /admin/drivers/{driver}` menerima `student_id/campus/study_program`
+- `GET /me/summary` (driver) menyertakan `verification`
+- Order baru untuk driver non-`verified` → kebijakan backend (mock: tetap boleh, UI menampilkan banner)
+
+### 6. Lain-lain
+
+- `GET /admin/payments` baris: `customer_name` (bukan `rider_name`), tanpa kolom `gateway`
+- `DriverJob`: `customer_name`, `customer_rating`, **tanpa** `surge_multiplier`
+- `Ride`: **tanpa** `surge_multiplier`
+- `payment_status` nilai: `unpaid | pending | paid | failed | refunded`
+- Email demo/domain: `*@ansian.id` (`customer@`, `driver@`, `admin@`, `support@`, `legal@`, `bantuan@`)
+- Pengaturan sistem (group `fare`) menyimpan entri zona (lihat `server/utils/mockApi/db.ts → buildSettings`)
+
+---
+
+## Integrasi Backend
+
+Secara default aplikasi memakai mock API bawaan di `server/utils/mockApi` agar dapat dijalankan mandiri. Untuk terhubung ke Laravel backend, set `NUXT_PUBLIC_USE_MOCK=false` dan `NUXT_PUBLIC_API_BASE` menuju URL backend Anda (`CUKLIZ/Ajem-UDINUS-BE`).
 
 ---
 
@@ -318,12 +446,14 @@ app/
   composables/   # useApi, useRealtime, useToast, usePreferences
   layouts/       # app, auth, default
   middleware/    # auth.global.ts
-  pages/         # rider/, driver/, admin/, halaman publik
+  pages/         # customer/, driver/, admin/, verifikasi, halaman publik
   plugins/       # leaflet.client.ts
   stores/        # auth, ride, chat, driver, notification, ui (Pinia)
-  utils/
-server/          # API routes + mock API
-shared/          # types, mocks, utils
+server/          # routes/api/v1 catch-all + utils/apiRouter.ts
+  utils/mockApi/ # db, auth (OTP), rides, admin — HAPUS saat backend aktif
+shared/
+  types/         # kontrak tipe (AuthChallenge, FareQuote zona, DriverProfile, …)
+  utils/         # geo (titik Semarang), pricing (TARIF ZONA), format
 ```
 
 ### Routing Halaman
@@ -331,38 +461,13 @@ shared/          # types, mocks, utils
 | Prefix | Layout | Akses |
 | --- | --- | --- |
 | `/`, `/tentang`, `/faq`, `/terms`, `/kebijakan-privasi` | `default` | Publik, di-prerender |
-| `/login`, `/register` | `auth` | Publik, di-prerender |
-| `/rider/**` | `app` | Rider |
+| `/login`, `/register`, `/verifikasi` | `auth` | Publik, di-prerender |
+| `/driver/daftar` | `auth` | Publik |
+| `/customer/**` | `app` | Pelanggan |
 | `/driver/**` | `app` | Driver |
 | `/admin/**` | `app` | Admin |
 
 Proteksi akses lewat `app/middleware/auth.global.ts` — jangan bypass dengan menonaktifkan middleware.
-
-### Kontrak API
-
-Semua panggilan frontend lewat `/api/v1/...`, yang **sama persis dengan path + method di `routes/api.php` Laravel**. Kalau backend aktif: set `NUXT_PUBLIC_USE_MOCK=false`, lalu file mock (`server/routes/`, `server/utils/mockApi/`) boleh dihapus **tanpa mengubah kode frontend**.
-
-Endpoint yang ter-cover (semua di `server/utils/apiRouter.ts`):
-
-| Group | Endpoint |
-| --- | --- |
-| Auth | `register`, `login`, `logout`, `me`, `profile`, `password`, `sessions` |
-| Me | `me/summary`, `me/activity` |
-| Rides | `rides`, `rides/:id`, `rides/:id/route`, `rides/:id/cancel`, `rides/:id/rate`, `rides/:id/timeline`, `rides/active` |
-| Fare | `fares/quote` |
-| Driver | `drivers`, `drivers/nearby`, `drivers/me`, `drivers/me/status`, `drivers/me/location`, `drivers/me/earnings`, `drivers/jobs`, `drivers/jobs/:ride/accept`, `drivers/jobs/:ride/reject`, `drivers/rides/:ride/arrive|start|complete` |
-| Chat | `conversations`, `conversations/:id`, `messages/:conversation`, `conversations/:id/messages`, `conversations/:id/read` |
-| Notification | `notifications`, `notifications/read-all`, `notifications/:id/read` |
-| Payment | `payments`, `payments/webhook` |
-| Admin | `stats`, `activity`, `charts/*`, `top-drivers`, `users`, `rides`, `payments`, `reports`, `settings` |
-
-Tambah endpoint baru? Update di **dua tempat**: `server/utils/apiRouter.ts` (mock) dan `Ajem-UDINUS-BE/routes/api.php` (Laravel). Kalau cuma salah satu, frontend bakal Proxy to/backend tidak sinkron.
-
----
-
-## Integrasi Backend
-
-Secara default aplikasi memakai mock API bawaan di `server/utils/mockApi` agar dapat dijalankan mandiri. Untuk terhubung ke Laravel backend, set `NUXT_PUBLIC_USE_MOCK=false` dan `NUXT_PUBLIC_API_BASE` menuju URL backend Anda (`CUKLIZ/Ajem-UDINUS-BE`).
 
 ---
 
@@ -374,36 +479,14 @@ npm run lint        # ESLint (flat config via @nuxt/eslint)
 npm run lint:fix    # ESLint + autofix
 ```
 
-> **Status saat ini: `npm run lint` belum bersih.** Baseline: **23 error + 50 warning**.
-> Jadi `lint` **belum bisa dipakai sebagai gerbang** (exit 1) — perlu PR terpisah
-> sampai hijau. `npm run typecheck` **sudah hijau** (0 error).
-
-Rule yang paling banyak violation:
-
-| Rule | Jumlah | Catatan |
-| --- | --- | --- |
-| `vue/require-default-prop` | 25 | props optional butuh `default` |
-| `@typescript-eslint/no-unused-vars` | 20 | impor/variabel tak terpakai |
-| `@typescript-eslint/no-explicit-any` | 20 | sudah di-set `warn` |
-| `vue/first-attribute-linebreak` | 3 | formatting |
-| `import/no-duplicates` | 2 | impor `h3` berulang |
-| `vue/no-required-prop-with-default` | 2 | |
-| `vue/no-ref-as-operand` | 1 | lihat catatan di bawah |
+> **Status `npm run lint`:** lihat hasil terakhir saat PR berikutnya — belum dijadikan gerbang
+> (exit 1) sampai baseline bersih. `npm run typecheck` **wajib hijau** (0 error).
 
 ### ⚠️ Jangan asal `lint --fix` untuk `no-unused-vars`
 
-Ada minimal satu kasus di mana "variabel unused" itu **memang harus tetap ada** —
-memanggilnya efek sampingnya yang penting:
-
-```ts
-// server/utils/mockApi/rides.ts — createConversation
-const user = authUser(event)   // ❌ JANGAN dihapus barisnya
-```
-
-`authUser()` **throw 401** kalau tidak ada session (lihat `server/utils/api.ts`). Baris
-itu adalah **auth guard** untuk endpoint tersebut. Assignment-nya yang tidak dipakai, bukan
-panggilannya. Kalau dihapus, endpoint `POST /api/v1/conversations` jadi bisa diakses
-tanpa login. Perbaikannya hanya buang assignment-nya:
+Ada kasus di mana "variabel unused" itu **memang harus tetap ada** —
+memanggilnya efek sampingnya yang penting (mis. auth guard `authUser(event)` yang me-throw 401
+kalau tidak ada session). Perbaikannya hanya buang assignment-nya, jangan hapus baris panggilannya:
 
 ```ts
 authUser(event)   // ✅ guard tetap jalan, tanpa variabel sia-sia
@@ -439,4 +522,4 @@ Hampir selalu karena `package-lock.json` berubah. Jalankan `npm install` ulang, 
 
 ## License
 
-Private — © Ajem-UDINUS. Repo ini private; jangan dibagikan ke luar tim tanpa izin.
+Private — © Ansian (tim: Alif Fahri Octavianto, Wiratama Rava Rahardia, Farid Nur Cahyo, M Setya Angga Adi Prabowo). Repo ini private; jangan dibagikan ke luar tim tanpa izin.

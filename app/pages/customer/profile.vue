@@ -18,7 +18,7 @@ const form = reactive({ name: '', phone: '' })
 const pass = reactive({ current_password: '', password: '', password_confirmation: '' })
 
 const roleLabel = computed(() =>
-  ({ rider: 'Penumpang', driver: 'Driver', admin: 'Administrator' })[auth.role ?? 'rider'],
+  ({ customer: 'Pelanggan', driver: 'Driver', admin: 'Administrator' })[auth.role ?? 'customer'],
 )
 
 function openEdit() {
@@ -151,7 +151,7 @@ async function logout() {
           </button>
 
           <NuxtLink
-            to="/rider/chat?new=support"
+            to="/customer/chat?new=support"
             class="flex items-center gap-3 rounded-xl border border-ink-200 p-3 transition hover:border-ink-300 hover:bg-ink-50"
           >
             <span class="grid size-9 place-items-center rounded-lg bg-violet-50 text-violet-600">

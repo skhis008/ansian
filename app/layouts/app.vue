@@ -16,15 +16,15 @@ interface NavItem {
 
 const nav = computed<NavItem[]>(() => {
   const base = auth.homePath
-  if (auth.isRider) {
+  if (auth.isCustomer) {
     return [
       { label: 'Beranda', to: base, icon: 'home' },
-      { label: 'Pesan Antar', to: '/rider/book', icon: 'navigation' },
-      { label: 'Riwayat', to: '/rider/rides', icon: 'history' },
-      { label: 'Pesanan Aktif', to: '/rider/active', icon: 'clock', badge: () => (useRideStore().hasActiveRide ? 1 : 0) },
-      { label: 'Chat', to: '/rider/chat', icon: 'message-circle', badge: () => chat.totalUnread },
-      { label: 'Pembayaran', to: '/rider/payments', icon: 'credit-card' },
-      { label: 'Profil', to: '/rider/profile', icon: 'user' },
+      { label: 'Pesan Antar', to: '/customer/book', icon: 'navigation' },
+      { label: 'Riwayat', to: '/customer/rides', icon: 'history' },
+      { label: 'Pesanan Aktif', to: '/customer/active', icon: 'clock', badge: () => (useRideStore().hasActiveRide ? 1 : 0) },
+      { label: 'Chat', to: '/customer/chat', icon: 'message-circle', badge: () => chat.totalUnread },
+      { label: 'Pembayaran', to: '/customer/payments', icon: 'credit-card' },
+      { label: 'Profil', to: '/customer/profile', icon: 'user' },
     ]
   }
   if (auth.isDriver) {

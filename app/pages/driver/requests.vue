@@ -122,7 +122,7 @@ async function reject(rideId: number) {
             <li v-for="(t, i) in [
               'Terima order dengan tarif peak yang masuk akal.',
               'Tiba di lokasi jemput maksimal 5 menit.',
-              'Jaga komunikasi lewat chat agar penumpang tenang.',
+              'Jaga komunikasi lewat chat agar pelanggan tenang.',
               'Selesaikan perjalanan dengan aman dan ramah.',
             ]" :key="i" class="flex items-start gap-2.5 text-[12.5px] text-ink-600">
               <span class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-brand-100 text-[9px] font-bold text-brand-700">

@@ -135,14 +135,14 @@ export async function geocodeSearch(query: string, signal?: AbortSignal): Promis
 }
 
 const LOCAL_PLACES: Place[] = [
-  { lat: -6.208763, lng: 106.8456, address: 'Bundaran HI, Jakarta Pusat', place_name: 'Bundaran HI' },
-  { lat: -6.175392, lng: 106.827153, address: 'Monas,Jakarta Pusat', place_name: 'Monas' },
-  { lat: -6.1944, lng: 106.8229, address: 'Grand Indonesia, Jakarta Pusat', place_name: 'Grand Indonesia' },
-  { lat: -6.2305, lng: 106.8003, address: 'Tanah Abang, Jakarta Pusat', place_name: 'Tanah Abang' },
-  { lat: -6.1447, lng: 106.8261, address: 'Kuningan, Jakarta Selatan', place_name: 'Kuningan' },
-  { lat: -6.2615, lng: 106.8106, address: 'Kemang Village, Jakarta Selatan', place_name: 'Kemang Village' },
-  { lat: -6.2, lng: 106.816666, address: 'Sudirman, Jakarta Pusat', place_name: 'Sudirman' },
-  { lat: -6.1256, lng: 106.7298, address: 'Kasih Kemal, Jakarta Barat', place_name: 'Kasih Kemal' },
+  { lat: -6.982835, lng: 110.409352, address: 'Kampus Udinus, Pendrikan Kidul, Semarang Tengah', place_name: 'Kampus Udinus' },
+  { lat: -6.9913, lng: 110.4163, address: 'Simpang Lima, Semarang', place_name: 'Simpang Lima' },
+  { lat: -6.9789, lng: 110.4168, address: 'Pandanaran, Semarang', place_name: 'Pandanaran' },
+  { lat: -6.9735, lng: 110.4287, address: 'Sriwawansari, Semarang Tengah', place_name: 'Sriwawansari' },
+  { lat: -6.9944, lng: 110.4064, address: 'Stasiun Tawang, Semarang', place_name: 'Stasiun Tawang' },
+  { lat: -6.9727, lng: 110.3767, address: 'Bandara Ahmad Yani, Semarang', place_name: 'Bandara Ahmad Yani' },
+  { lat: -6.9663, lng: 110.4638, address: 'Genuk, Semarang Timur', place_name: 'Genuk' },
+  { lat: -6.9881, lng: 110.3932, address: 'Salaman Mloyo, Semarang Barat', place_name: 'Salaman Mloyo' },
 ]
 
 /** Pencarian lokal saat Nominatim tidak tersedia (demo / offline) */
@@ -227,46 +227,16 @@ export async function fetchRoute(from: LatLng, to: LatLng, signal?: AbortSignal)
   }
 }
 
-/** Harga standar (belum termasuk surge) — akan ditimpa server Laravel */
-export const FARE_CONFIG = {
-  baseFare: 5000,
-  perKm: 2500,
-  perMinute: 150,
-  minFare: 8000,
-  serviceFeePercent: 0.08,
-  avgSpeedKmh: 26,
-} as const
-
-export function estimateFare(distanceKmValue: number, durationMinValue: number, surge = 1) {
-  const distanceFare = distanceKmValue * FARE_CONFIG.perKm
-  const timeFare = durationMinValue * FARE_CONFIG.perMinute
-  const beforeSurge = Math.max(FARE_CONFIG.minFare, FARE_CONFIG.baseFare + distanceFare + timeFare)
-  const surgeFare = Math.max(0, beforeSurge * (surge - 1))
-  const total = beforeSurge + surgeFare
-  const serviceFee = Math.round(total * FARE_CONFIG.serviceFeePercent)
-  return {
-    distance_km: Math.round(distanceKmValue * 100) / 100,
-    duration_min: Math.round(durationMinValue),
-    base_fare: FARE_CONFIG.baseFare,
-    distance_fare: Math.round(distanceFare),
-    surge_fare: Math.round(surgeFare),
-    service_fee: serviceFee,
-    total: Math.round(total + serviceFee),
-    currency: 'IDR',
-    surge_multiplier: surge,
-  }
-}
-
-/** Posisi user saat ini dengan fallback ke Jakarta Pusat */
+/** Posisi user saat ini dengan fallback ke pusat area Udinus */
 export function currentPosition(): Promise<LatLng> {
   return new Promise(resolve => {
     if (!navigator.geolocation) {
-      resolve({ lat: -6.208763, lng: 106.8456 })
+      resolve({ lat: -6.982835, lng: 110.409352 })
       return
     }
     navigator.geolocation.getCurrentPosition(
       pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => resolve({ lat: -6.208763, lng: 106.8456 }),
+      () => resolve({ lat: -6.982835, lng: 110.409352 }),
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 30_000 },
     )
   })

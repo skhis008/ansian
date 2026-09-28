@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /rider/
+Disallow: /driver/
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://ansian.id/sitemap.xml

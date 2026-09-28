@@ -9,7 +9,7 @@ await callOnce('auth:init', () => auth.fetchUser())
 
 /* SEO default — setiap halaman menimpanya sendiri */
 useHead({
-  titleTemplate: title => (title ? `${title} · ${config.public.appName}` : `${config.public.appName} · Antar Jemput Murah & Mudah`),
+  titleTemplate: title => (title ? `${title} · ${config.public.appName}` : `${config.public.appName} · Antar Jemput Dinusian`),
 })
 
 useSeoMeta({

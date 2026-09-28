@@ -30,12 +30,12 @@ const rows = computed(() => data.value?.data ?? [])
 const meta = computed(() => data.value?.meta)
 
 const editing = ref<User | null>(null)
-const form = reactive({ name: '', email: '', phone: '', role: 'rider' as UserRole, status: 'active' })
+const form = reactive({ name: '', email: '', phone: '', role: 'customer' as UserRole, status: 'active' })
 const saving = ref(false)
 const removing = ref<User | null>(null)
 
 const ROLE_TONES: Record<string, 'brand' | 'info' | 'purple'> = {
-  rider: 'brand',
+  customer: 'brand',
   driver: 'info',
   admin: 'purple',
 }
@@ -87,7 +87,7 @@ async function confirmDelete() {
 
 <template>
   <div class="space-y-5">
-    <AppPageHeader title="Pengguna" description="Kelola akun penumpang, driver, dan administrator." />
+    <AppPageHeader title="Pengguna" description="Kelola akun pelanggan, driver, dan administrator." />
 
     <UiCard :padded="false">
       <div class="flex flex-wrap items-center gap-3 border-b border-ink-100 p-4">
@@ -105,7 +105,7 @@ async function confirmDelete() {
           class="h-10 rounded-xl border border-ink-200 bg-white px-3 text-[12.5px] font-medium text-ink-700 outline-none focus:border-brand-500"
         >
           <option value="">Semua peran</option>
-          <option value="rider">Penumpang</option>
+          <option value="customer">Pelanggan</option>
           <option value="driver">Driver</option>
           <option value="admin">Admin</option>
         </select>
@@ -204,7 +204,7 @@ async function confirmDelete() {
               v-model="form.role"
               class="h-10 w-full rounded-xl border border-ink-200 bg-white px-3 text-[13px] text-ink-800 outline-none focus:border-brand-500"
             >
-              <option value="rider">Penumpang</option>
+              <option value="customer">Pelanggan</option>
               <option value="driver">Driver</option>
               <option value="admin">Admin</option>
             </select>

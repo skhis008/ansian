@@ -1,8 +1,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 useSeoMeta({
-  title: 'Syarat & Ketentuan — AntarJemput',
-  description: 'Syarat dan ketentuan penggunaan aplikasi dan layanan AntarJemput sebagai penumpang maupun driver.',
+  title: 'Syarat & Ketentuan — Ansian',
+  description: 'Syarat dan ketentuan penggunaan aplikasi dan layanan Ansian (Antar Jemput Dinusian) sebagai pelanggan maupun driver mahasiswa.',
 })
 
 const sections = [
@@ -10,7 +10,7 @@ const sections = [
     anchor: 'lingkup',
     title: '1. Ruang Lingkup Layanan',
     body: [
-      'AntarJemput menyediakan layanan pengangkutan jalan yang menghubungkan penumpang dengan driver mitra. Layanan ini merupakan layanan berbasis aplikasi, bukan jasa angkut daring..',
+      'Ansian (Antar Jemput Dinusian) menyediakan layanan antar-jemput berbasis motor yang menghubungkan pelanggan dengan driver mitra di area Udinus dan sekitarnya. Layanan ini merupakan layanan berbasis aplikasi, bukan jasa angkut daring.',
       'Dengan mendaftar dan menggunakan aplikasi, kamu menyatakan berusia minimal 18 tahun, memiliki kapasitas hukum untuk terikat oleh ketentuan di dokumen ini, dan menyetujui seluruh isinya.',
     ],
   },
@@ -19,7 +19,8 @@ const sections = [
     title: '2. Akun dan Verifikasi',
     body: [
       'Kamu bertanggung jawab menjaga kerahasiaan kredensial akun dan dilarang membagikan akun kepada pihak lain.',
-      'Kami dapat mewajibkan verifikasi nomor WhatsApp. Bagi driver, verifikasi KTP, SIM, STNK, dan foto kendaraan bersifat wajib. Driver yang tidak dapat diverifikasi akan ditolak dan keanggotaannya dibatalkan.',
+      'Saat mendaftar dan login, kami mengirim kode verifikasi unik 6 digit ke alamat email terdaftar untuk memastikan pemilik akun. Device yang sudah dipercaya tidak akan diminta kode lagi selama 30 hari.',
+      'Pelanggan dapat berupa mahasiswa maupun warga lokal. Bagi driver, verifikasi bersifat wajib: khusus mahasiswa aktif dengan NIM, nama kampus, SIM, dan data kendaraan yang ditinjau oleh admin. Pendaftaran yang tidak dapat diverifikasi akan ditolak.',
     ],
   },
   {
@@ -34,15 +35,15 @@ const sections = [
     anchor: 'tarif',
     title: '4. Tarif dan Pembayaran',
     body: [
-      'Tarif dihitung berdasarkan tarif dasar, jarak tempuh, durasi perjalanan, dan biaya layanan yang berlaku. Rincian tarif ditampilkan secara transparan sebelum konfirmasi.',
-      'Pembayaran dapat dilakukan melalui QRIS, virtual account, kartu, e-wallet, saldo aplikasi, atau tunai kepada driver. Pemrosesan pembayaran dilakukan oleh penyedia gerbang pembayaran yang bekerja sama dengan kami.',
+      'Tarif ditentukan oleh zona jarak: Zona Hijau (0–2,5 km), Zona Kuning (2,5–6,5 km), Zona Jingga (6,5–10,5 km), dan Zona Merah (≥10,5 km), ditambah biaya admin tetap sesuai zona. Rincian tarif ditampilkan secara transparan sebelum konfirmasi, tanpa lonjakan harga maupun biaya tersembunyi.',
+      'Pembayaran dilakukan tunai kepada driver, atau QRIS melalui aplikasi e-wallet/mobile banking apa pun. Untuk QRIS, pembayaran diverifikasi oleh tim kami sebelum perjalanan ditandai lunas.',
     ],
   },
   {
     anchor: 'driver',
     title: '5. Tanggung Jawab Driver',
     body: [
-      'Driver wajib mengendarai dengan aman,awatan kendaraan secara berkala, merah dari menyimpan data penumpang, dan menerapkan prosedur keselamatan yang berlaku.',
+      'Driver wajib mahasiswa aktif, mengendarai dengan aman, merawat kendaraan secara berkala, menjaga kerahasiaan data pelanggan, dan menerapkan prosedur keselamatan yang berlaku.',
       'Driver dilarang mengendarai dalam keadaan mabuk, kelelahan, atau menggunakan obat yang mengganggu kemampuan mengendarai.',
     ],
   },
@@ -66,7 +67,7 @@ const sections = [
     anchor: 'perubahan',
     title: '8. Perubahan Ketentuan',
     body: [
-      'Kami dapat memperbarui ketentuan ini kapan saja. Perubahan memberitahukan lewat notifikasi dalam aplikasi atau email paling lambat tujuh hari sebelum berlaku.',
+      'Kami dapat memperbarui ketentuan ini kapan saja. Perubahan diberitahukan lewat notifikasi dalam aplikasi atau email paling lambat tujuh hari sebelum berlaku.',
       'Menggunakan aplikasi setelah perubahan berlaku dianggap sebagai persetujuan kamu terhadap ketentuan terbaru.',
     ],
   },
@@ -74,7 +75,7 @@ const sections = [
     anchor: 'kontak',
     title: '9. Kontak',
     body: [
-      'Pertanyaan mengenai ketentuan ini dapat disampaikan melalui customer service di dalam aplikasi atau ke legal@antarjemput.id.',
+      'Pertanyaan mengenai ketentuan ini dapat disampaikan melalui customer service di dalam aplikasi atau ke legal@ansian.id.',
     ],
   },
 ]
@@ -84,7 +85,7 @@ const sections = [
     <header class="max-w-2xl">
       <h1 class="text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">Syarat & Ketentuan</h1>
       <p class="mt-3 text-[14px] text-ink-500">
-        Terakhir diperbarui: 1 Januari 2026 · Berlaku untuk seluruh pengguna di wilayah operasi.
+        Terakhir diperbarui: 1 Januari 2026 · Berlaku untuk seluruh pengguna di area layanan Ansian.
       </p>
     </header>
 

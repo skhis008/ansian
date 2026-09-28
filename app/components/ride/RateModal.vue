@@ -13,7 +13,7 @@ const hovered = ref(0)
 const comment = ref('')
 const tags = ref<string[]>([])
 
-const TAGS = ['Tepat waktu', 'Ramah', 'Bersih kendaraan', 'Hemat', 'Aman mengendar', 'Rela diantar lagi']
+const TAGS = ['Tepat waktu', 'Ramah', 'Kendaraan Bersih', 'Hemat', 'Aman', 'Rela diantar lagi']
 
 watch(
   () => props.open,

@@ -107,7 +107,7 @@ const filtered = computed(() => {
             </div>
 
             <p class="mt-2.5 text-[11px] text-ink-400">
-              {{ r.rider?.name }} · {{ r.distance_km.toFixed(1) }} km · {{ r.duration_min }} mnt
+              {{ r.customer?.name }} · {{ r.distance_km.toFixed(1) }} km · {{ r.duration_min }} mnt
             </p>
           </div>
 

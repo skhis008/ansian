@@ -6,7 +6,7 @@ definePageMeta({ layout: 'auth' })
 
 useSeoMeta({
   title: 'Daftar Gratis',
-  description: 'Daftar sebagai penumpang untuk memesan antar jemput, atau sebagai driver untuk mulai menghasilkan penghasilan.',
+  description: 'Daftar sebagai pelanggan untuk memesan antar jemput, atau sebagai driver untuk mulai menghasilkan penghasilan.',
   robots: 'noindex, follow',
 })
 
@@ -14,7 +14,6 @@ const auth = useAuthStore()
 const toast = useToast()
 
 const form = reactive({
-  role: 'rider' as 'rider' | 'driver',
   name: '',
   email: '',
   phone: '',
@@ -67,10 +66,16 @@ async function submit() {
   if (!validate()) return
 
   try {
-    const user = await auth.register({ ...form })
-    toast.success(`Akun ${form.role === 'driver' ? 'driver' : 'penumpang'} berhasil dibuat!`)
-    await navigateTo(auth.homePath)
-    return user
+    await auth.register({
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      password: form.password,
+      password_confirmation: form.password_confirmation,
+      role: 'customer',
+    })
+    toast.success('Kode verifikasi dikirim ke email kamu.')
+    await navigateTo('/verifikasi')
   } catch (e) {
     if (e instanceof ApiError) {
       serverError.value = e.message
@@ -87,37 +92,13 @@ async function submit() {
     <h1 class="text-2xl font-bold tracking-tight text-ink-900">Buat akun</h1>
     <p class="mt-1.5 text-sm text-ink-500">Gratis, hanya butuh 1 menit.</p>
 
-    <!-- Pilih role -->
-    <div class="mt-6 grid grid-cols-2 gap-3">
-      <button
-        type="button"
-        class="flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition"
-        :class="form.role === 'rider' ? 'border-brand-500 bg-brand-50/60' : 'border-ink-200 hover:border-ink-300'"
-        @click="form.role = 'rider'"
-      >
-        <span class="grid size-10 place-items-center rounded-xl" :class="form.role === 'rider' ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-500'">
-          <UiIcon name="user" class="size-5" />
-        </span>
-        <span class="text-center">
-          <span class="block text-sm font-semibold text-ink-900">Saya Penumpang</span>
-          <span class="mt-0.5 block text-[11px] text-ink-500">Butuh diantar</span>
-        </span>
-      </button>
-
-      <button
-        type="button"
-        class="flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition"
-        :class="form.role === 'driver' ? 'border-emerald-500 bg-emerald-50/60' : 'border-ink-200 hover:border-ink-300'"
-        @click="form.role = 'driver'"
-      >
-        <span class="grid size-10 place-items-center rounded-xl" :class="form.role === 'driver' ? 'bg-emerald-600 text-white' : 'bg-ink-100 text-ink-500'">
-          <UiIcon name="car" class="size-5" />
-        </span>
-        <span class="text-center">
-          <span class="block text-sm font-semibold text-ink-900">Saya Driver</span>
-          <span class="mt-0.5 block text-[11px] text-ink-500">Ingin penghasilan</span>
-        </span>
-      </button>
+    <div class="mt-5 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-3">
+      <UiIcon name="bike" class="mt-0.5 size-4 shrink-0 text-emerald-600" />
+      <p class="text-[12.5px] leading-relaxed text-emerald-800">
+        Mahasiswa yang ingin menghasilkan?
+        <NuxtLink to="/driver/daftar" class="font-bold underline hover:no-underline">Daftar jadi driver Ansian</NuxtLink>
+        — dengan NIM & kampus.
+      </p>
     </div>
 
     <div
@@ -228,7 +209,7 @@ async function submit() {
       </div>
 
       <UiButton type="submit" size="lg" block :loading="auth.loading">
-        {{ form.role === 'driver' ? 'Daftar sebagai Driver' : 'Daftar Sekarang' }}
+        Daftar Sekarang
       </UiButton>
     </form>
 

@@ -31,7 +31,7 @@ watch(search, v => {
 })
 
 const { data, pending, refresh } = await useAsyncData(
-  () => `rider-rides-${auth.user?.id}`,
+  () => `customer-rides-${auth.user?.id}`,
   () =>
     http.get<Paginated<Ride>>('/rides', {
       filter: activeTab.value || undefined,
@@ -73,7 +73,7 @@ async function exportCsv() {
           <template #icon><UiIcon name="download" class="size-4" /></template>
           Ekspor
         </UiButton>
-        <UiButton to="/rider/book" size="sm">
+        <UiButton to="/customer/book" size="sm">
           <template #icon><UiIcon name="plus" class="size-4" /></template>
           Pesan Baru
         </UiButton>
@@ -159,7 +159,7 @@ async function exportCsv() {
         title="Belum ada perjalanan"
         description="Riwayat perjalanan kamu akan muncul di sini setelah kamu selesai bepergian."
       >
-        <UiButton to="/rider/book">Pesan Sekarang</UiButton>
+        <UiButton to="/customer/book">Pesan Sekarang</UiButton>
       </AppEmptyState>
     </div>
 
