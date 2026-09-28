@@ -571,7 +571,7 @@ export async function listConversations(event: H3Event) {
 
 /** POST /api/v1/conversations */
 export async function createConversation(event: H3Event) {
-  const user = authUser(event)
+  authUser(event)
   const body = await readPayload(event)
   const ride = findOr404(rideByCode(String(body.ride_code ?? '')), 'Perjalanan tidak ditemukan.')
 

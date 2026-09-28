@@ -11,7 +11,6 @@ const chat = useChatStore()
 const toast = useToast()
 const router = useRouter()
 const route = useRoute()
-const auth = useAuthStore()
 const realtime = useRealtime()
 
 const cancelOpen = ref(false)

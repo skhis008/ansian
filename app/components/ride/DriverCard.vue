@@ -2,7 +2,7 @@
 import type { Driver } from '#shared/types'
 import { formatDistance, formatNumber, formatRating } from '#shared/utils/format'
 
-const props = defineProps<{ driver: Driver; distanceKm?: number; eta?: number; compact?: boolean }>()
+defineProps<{ driver: Driver; distanceKm?: number; eta?: number; compact?: boolean }>()
 
 const VEHICLE: Record<Driver['vehicle_type'], { label: string; icon: string }> = {
   motorcycle: { label: 'Motor', icon: 'bike' },

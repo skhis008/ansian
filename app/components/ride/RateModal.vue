@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import type { Ride } from '#shared/types'
 
 const props = defineProps<{ open: boolean; ride: Ride | null }>()

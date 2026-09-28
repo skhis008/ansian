@@ -1,6 +1,4 @@
-import type { H3Event } from 'h3'
-import { getMethod } from 'h3'
-import { createError } from 'h3'
+import { createError, getMethod, type H3Event } from 'h3'
 import * as auth from './mockApi/auth'
 import * as rides from './mockApi/rides'
 import * as admin from './mockApi/admin'

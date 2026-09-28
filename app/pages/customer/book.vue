@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { LatLng, PaymentMethod, Place } from '#shared/types'
-import { fetchRoute, pathDurationMin, pathLengthKm, syntheticRoute } from '#shared/utils/geo'
+import { fetchRoute, syntheticRoute } from '#shared/utils/geo'
 import { formatRupiah } from '#shared/utils/format'
 
 definePageMeta({ layout: 'app' })
@@ -19,7 +19,6 @@ const paymentMethod = ref<PaymentMethod>('cash')
 const scheduled = ref(false)
 const scheduledAt = ref('')
 
-const swapPoints = ref(false)
 let routeController: AbortController | null = null
 
 const METHODS: { value: PaymentMethod; label: string; desc: string; icon: string; tone: string }[] = [
@@ -85,14 +84,6 @@ const distanceLabel = computed(() => {
   return `${q.distance_km} km · ${q.duration_min} menit`
 })
 
-const pathSummary = computed(() => {
-  if (!routePath.value?.length) return null
-  return {
-    km: pathLengthKm(routePath.value),
-    min: pathDurationMin(routePath.value),
-  }
-})
-void pathSummary
 </script>
 
 <template>

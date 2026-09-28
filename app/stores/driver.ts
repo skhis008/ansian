@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { AppNotification, DriverEarnings, DriverJob, DriverProfile, LatLng, Ride } from '#shared/types'
+import type { DriverEarnings, DriverJob, DriverProfile, LatLng, Ride } from '#shared/types'
 import { http } from '~/composables/useApi'
 import type { DriverLocationEvent } from '~/composables/useRealtime'
 

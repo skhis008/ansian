@@ -479,8 +479,9 @@ npm run lint        # ESLint (flat config via @nuxt/eslint)
 npm run lint:fix    # ESLint + autofix
 ```
 
-> **Status `npm run lint`:** lihat hasil terakhir saat PR berikutnya — belum dijadikan gerbang
-> (exit 1) sampai baseline bersih. `npm run typecheck` **wajib hijau** (0 error).
+> **Status (2026-09-28):** `npm run lint` → **0 error**, 50 warning (mayoritas `no-explicit-any`
+> yang sudah diset `warn`). Error wajib tetap 0; sisa warning menyusul di PR terpisah.
+> `npm run typecheck` **wajib hijau** (0 error).
 
 ### ⚠️ Jangan asal `lint --fix` untuk `no-unused-vars`
 

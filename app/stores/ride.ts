@@ -150,9 +150,9 @@ export const useRideStore = defineStore('ride', {
       const tick = async () => {
         if (!this.polling) return
         await this.fetchActive()
-        timer = setTimeout(tick, intervalMs)
+        setTimeout(tick, intervalMs)
       }
-      let timer: ReturnType<typeof setTimeout> = setTimeout(tick, intervalMs)
+      setTimeout(tick, intervalMs)
       void useToast()
     },
 

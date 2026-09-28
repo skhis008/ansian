@@ -23,7 +23,7 @@ type ReportPayload = {
   by_vehicle: RevenueByVehicleType[]
 }
 
-const { data, pending, refresh } = await useAsyncData(
+const { data, pending } = await useAsyncData(
   'admin-reports',
   () => http.get<{ data: ReportPayload }>('/admin/reports', { days: range.value }).then(r => r.data),
   { watch: [range] },

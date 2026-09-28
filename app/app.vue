@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const auth = useAuthStore()
 const ui = useUiStore()
-const route = useRoute()
 const config = useRuntimeConfig()
 
 /* Session di-resolve di server agar tidak flash login state */

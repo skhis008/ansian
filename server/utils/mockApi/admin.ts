@@ -9,7 +9,6 @@ import type {
   TopDriver,
 } from '#shared/types'
 import {
-  authUser,
   db,
   delay,
   findOr404,

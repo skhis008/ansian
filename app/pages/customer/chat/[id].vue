@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 
 definePageMeta({ layout: 'app' })
 useSeoMeta({ title: 'Percakapan', robots: 'noindex, nofollow' })
@@ -10,7 +10,6 @@ const route = useRoute()
 const toast = useToast()
 const realtime = useRealtime()
 
-const draft = ref('')
 const conversation = computed(() => chat.activeConversation)
 const messages = computed(() => (chat.activeId ? chat.messagesOf(chat.activeId) : []))
 

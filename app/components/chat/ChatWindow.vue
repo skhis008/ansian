@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import type { ChatMessage, Conversation } from '#shared/types'
-import { formatRelative } from '#shared/utils/format'
 
 const props = defineProps<{
   conversation: Conversation | null

@@ -30,7 +30,7 @@ watch(search, v => {
   }, 350)
 })
 
-const { data, pending, refresh } = await useAsyncData(
+const { data, pending } = await useAsyncData(
   () => `customer-rides-${auth.user?.id}`,
   () =>
     http.get<Paginated<Ride>>('/rides', {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { currentPosition } from '#shared/utils/geo'
 
 definePageMeta({ layout: 'app' })

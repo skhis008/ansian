@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { formatRupiah, formatNumber } from '#shared/utils/format'
-import { distanceKm, currentPosition } from '#shared/utils/geo'
+import { currentPosition } from '#shared/utils/geo'
 
 definePageMeta({ layout: 'app' })
 useSeoMeta({ title: 'Dashboard Driver', robots: 'noindex, nofollow' })

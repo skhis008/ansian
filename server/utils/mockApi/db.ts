@@ -285,7 +285,6 @@ function buildRides(users: User[], drivers: DriverProfile[]): Ride[] {
 /* ---------------- CHAT ---------------- */
 
 function buildConversations(users: User[], rides: Ride[]): { convs: Conversation[]; msgs: ChatMessage[] } {
-  const rnd = seeded(7)
   const drivers = users.filter(u => u.role === 'driver')
   const convs: Conversation[] = []
   const msgs: ChatMessage[] = []
