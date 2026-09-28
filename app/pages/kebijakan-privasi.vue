@@ -1,8 +1,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 useSeoMeta({
-  title: 'Kebijakan Privasi — AntarJemput',
-  description: 'Kebijakan privasi dan perlindungan data pribadi pengguna aplikasi AntarJemput.',
+  title: 'Kebijakan Privasi — Ansian',
+  description: 'Kebijakan privasi dan perlindungan data pribadi pengguna aplikasi Ansian.',
 })
 
 const sections = [
@@ -11,8 +11,9 @@ const sections = [
     title: '1. Data yang Kami Kumpulkan',
     items: [
       'Data akun: nama, alamat email, nomor WhatsApp, dan kata sandi (disimpan dalam bentuk terenkripsi).',
-      'Data perjalanan: lokasi jemput dan tujuan, rute, waktu, serta nominal tarif.',
-      'Data kendaraan dan dokumen driver: KTP, SIM, STNK, dan foto kendaraan.',
+      'Data verifikasi: kode unik 6 digit yang dikirim ke emailmu saat pendaftaran/login, serta status kepercayaan device (30 hari).',
+      'Data perjalanan: lokasi jemput dan tujuan, rute, waktu, serta nominal tarif zona.',
+      'Data kendaraan dan dokumen driver: NIM, nama kampus, prodi, SIM, dan data kendaraan.',
       'Data penggunaan: jenis perangkat, aplikasi, dan halaman yang diakses.',
     ],
   },
@@ -21,10 +22,11 @@ const sections = [
     title: '2. Penggunaan Data',
     items: [
       'Menyediakan fitur pemesanan, pencarian driver, dan navigasi perjalanan.',
-      'Menghubungkan penumpang dengan driver terdekat sesuai lokasi yang dipilih.',
-      'Menghitung tarif dan memproses pembayaran.',
-      'Mengirim notifikasi terkait perjalanan, pembayaran, dan pembaruan aplikasi.',
-      'Meningkatkan kualitas layanan dan mencegah penyalahgunaan.',
+      'Menghubungkan pelanggan dengan driver terdekat sesuai lokasi yang dipilih.',
+      'Menghitung tarif zona dan memproses pembayaran (tunai/QRIS).',
+      'Mengirim kode verifikasi email serta notifikasi terkait perjalanan dan pembayaran.',
+      'Memverifikasi status mahasiswa driver dan mencegah penyalahgunaan.',
+      'Meningkatkan kualitas layanan.',
     ],
   },
   {
@@ -32,7 +34,7 @@ const sections = [
     title: '3. Berbagi Data',
     items: [
       'Data perjalanan dibagikan kepada driver yang ditugaskan, khusus pada lokasi jemput dan tujuan.',
-      'Data pembayaran dibagikan kepada penyedia gerbang pembayaran untuk memproses transaksi.',
+      'Data mahasiswa (NIM, kampus) hanya dipakai untuk verifikasi kelayakan menjadi driver.',
       'Data dapat diserahkan kepada otoritas yang berwenang bila diwajibkan oleh hukum.',
       'Kami tidak menjual data pribadi kepada pihak ketiga.',
     ],
@@ -52,7 +54,7 @@ const sections = [
     items: [
       'Mengakses dan memperbarui data melalui menu Profil.',
       'Meminta salinan data pribadi yang kami simpan.',
-      'Meminta penghapusan data denganadie yang berlaku.',
+      'Meminta penghapusan data dengan prosedur yang berlaku.',
       'Menarik persetujuan atas pemrosesan data tertentu.',
     ],
   },
@@ -61,7 +63,7 @@ const sections = [
     title: '6. Keamanan',
     items: [
       'Kami menerapkan langkah teknis dan organisasi untuk melindungi data dari akses tidak sah.',
-      'Tidak ada metode pengiriman yang sepenuhnya aman, sehingga kami sangat menyarankan kamu untuk tidak membagikan kata sandi.',
+      'Tidak ada metode pengiriman yang sepenuhnya aman, sehingga kami sangat menyarankan kamu untuk tidak membagikan kata sandi maupun kode verifikasi.',
     ],
   },
   {
@@ -69,7 +71,7 @@ const sections = [
     title: '7. Perubahan Kebijakan',
     items: [
       'Kebijakan ini dapat diperbarui sewaktu-waktu.',
-      'Perubahan memberitahukan lewat notifikasi dalam aplikasi atau email.',
+      'Perubahan diberitahukan lewat notifikasi dalam aplikasi atau email.',
     ],
   },
 ]
@@ -115,7 +117,7 @@ const sections = [
         <UiCard class="bg-ink-50">
           <p class="text-[12.5px] text-ink-600">
             Untuk permintaan terkait data pribadi, hubungi kami melalui customer service di dalam aplikasi atau kirim email
-            ke privasi@antarjemput.id.
+            ke bantuan@ansian.id
           </p>
         </UiCard>
       </article>

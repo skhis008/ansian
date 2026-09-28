@@ -49,7 +49,7 @@ const groups = computed(() => {
   <div class="mx-auto max-w-2xl">
     <AppPageHeader title="Pesan" description="Percakapan dengan driver dan tim kami.">
       <template #actions>
-        <UiButton variant="outline" size="sm" to="/rider/chat?new=support">
+        <UiButton variant="outline" size="sm" to="/customer/chat?new=support">
           <template #icon><UiIcon name="message-circle" class="size-4" /></template>
           Hubungi CS
         </UiButton>
@@ -78,14 +78,14 @@ const groups = computed(() => {
         title="Belum ada percakapan"
         description="Mulai chat dengan driver atau tim bantuan kami."
       >
-        <UiButton to="/rider/book">Pesan perjalanan</UiButton>
+        <UiButton to="/customer/book">Pesan perjalanan</UiButton>
       </AppEmptyState>
     </div>
 
     <ul v-else class="space-y-2">
       <li v-for="g in groups" :key="g.conv.id">
         <NuxtLink
-          :to="{ path: '/rider/chat', query: { id: g.conv.id } }"
+          :to="{ path: '/customer/chat', query: { id: g.conv.id } }"
           class="flex items-center gap-3.5 rounded-2xl border bg-white p-3.5 transition"
           :class="chat.activeId === g.conv.id ? 'border-brand-400 ring-1 ring-brand-200' : 'border-ink-200/80 hover:border-brand-300 hover:shadow-soft'"
         >

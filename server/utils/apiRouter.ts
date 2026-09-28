@@ -47,6 +47,8 @@ const routes: Route[] = [
   /* ---------- AUTH ---------- */
   route('POST', '/api/v1/auth/register', auth.register),
   route('POST', '/api/v1/auth/login', auth.login),
+  route('POST', '/api/v1/auth/otp/verify', auth.verifyOtp),
+  route('POST', '/api/v1/auth/otp/resend', auth.resendOtp),
   route('POST', '/api/v1/auth/logout', auth.logout),
   route('GET', '/api/v1/auth/me', auth.me),
   route('PATCH', '/api/v1/auth/profile', auth.updateProfile),
@@ -100,6 +102,7 @@ const routes: Route[] = [
   route('POST', '/api/v1/notifications/:notification/read', rides.readNotification),
 
   /* ---------- PAYMENTS ---------- */
+  route('GET', '/api/v1/payments/qris', rides.qrisConfig),
   route('GET', '/api/v1/payments', rides.listPayments),
   route('POST', '/api/v1/payments', rides.createPayment),
   route('POST', '/api/v1/payments/webhook', rides.paymentWebhook),
@@ -121,6 +124,7 @@ const routes: Route[] = [
   route('GET', '/api/v1/admin/payments', admin.adminListPayments),
   route('GET', '/api/v1/admin/reports', admin.adminReports),
   route('PATCH', '/api/v1/admin/drivers/:driver', admin.adminUpdateDriver),
+  route('POST', '/api/v1/admin/drivers/:driver/verify', admin.verifyDriver),
   route('GET', '/api/v1/admin/settings', admin.getSettings),
   route('PUT', '/api/v1/admin/settings', admin.updateSettings),
 ]

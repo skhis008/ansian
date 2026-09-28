@@ -36,7 +36,7 @@ async function select(n: AppNotification) {
   if (rideId) {
     const auth = useAuthStore()
     if (auth.isDriver) navigateTo('/driver/active')
-    else navigateTo(`/rider/rides/${rideId}`)
+    else navigateTo(`/customer/rides/${rideId}`)
   }
 }
 

@@ -4,7 +4,7 @@ const columns = [
   {
     title: 'Produk',
     links: [
-      { label: 'Antar Penumpang', to: '/register' },
+      { label: 'Antar Pelanggan', to: '/register' },
       { label: 'Jadi Driver', to: '/driver/daftar' },
       { label: 'Kirim Barang', to: '/#fitur' },
       { label: 'Harga & Tarif', to: '/#harga' },
@@ -38,7 +38,8 @@ const columns = [
             <span class="text-[17px] font-bold tracking-tight text-ink-900">{{ $config.public.appName }}</span>
           </div>
           <p class="mt-3 max-w-sm text-sm leading-relaxed text-ink-500">
-            Layanan antarjemput instan untuk kota-kota besar di Indonesia. Aman, cepat, dan harga tertera di depan.
+            Antar-jemput motor dengan tarif zona yang hemat untuk area Udinus dan sekitarnya — sekaligus wadah kerja
+            sampingan bagi mahasiswa.
           </p>
           <div class="mt-5 flex gap-2">
             <span class="grid size-9 place-items-center rounded-lg border border-ink-200 text-ink-500">

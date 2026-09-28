@@ -27,9 +27,18 @@ const profile = computed(() => driver.profile)
 
 const VEHICLES: { value: VehicleType; label: string; icon: string }[] = [
   { value: 'motorcycle', label: 'Motor', icon: 'bike' },
-  { value: 'car', label: 'Mobil', icon: 'car' },
-  { value: 'van', label: 'Van', icon: 'package' },
 ]
+
+const VERIFICATION_TONES: Record<string, 'success' | 'warning' | 'danger'> = {
+  verified: 'success',
+  pending: 'warning',
+  rejected: 'danger',
+}
+const VERIFICATION_TEXT: Record<string, string> = {
+  verified: 'Terverifikasi',
+  pending: 'Menunggu verifikasi admin',
+  rejected: 'Ditolak — hubungi CS',
+}
 
 const STATUS_LABEL: Record<string, string> = {
   offline: 'Offline',
@@ -111,6 +120,33 @@ async function save() {
       </div>
     </UiCard>
 
+    <!-- Data mahasiswa & verifikasi -->
+    <UiCard>
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-sm font-bold text-ink-900">Data mahasiswa</h2>
+        <UiBadge :tone="VERIFICATION_TONES[profile?.verification ?? 'pending']" dot>
+          {{ VERIFICATION_TEXT[profile?.verification ?? 'pending'] }}
+        </UiBadge>
+      </div>
+      <div class="mt-4 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-xl bg-ink-50 p-3.5">
+          <p class="text-[10px] text-ink-400 uppercase">NIM</p>
+          <p class="mt-0.5 font-mono text-sm font-bold text-ink-900">{{ profile?.student_id || '-' }}</p>
+        </div>
+        <div class="rounded-xl bg-ink-50 p-3.5">
+          <p class="text-[10px] text-ink-400 uppercase">Kampus</p>
+          <p class="mt-0.5 text-sm font-bold text-ink-900">{{ profile?.campus || '-' }}</p>
+        </div>
+        <div class="rounded-xl bg-ink-50 p-3.5">
+          <p class="text-[10px] text-ink-400 uppercase">Program studi</p>
+          <p class="mt-0.5 text-sm font-bold text-ink-900">{{ profile?.study_program || '-' }}</p>
+        </div>
+      </div>
+      <p v-if="profile?.verification !== 'verified'" class="mt-3 rounded-xl bg-amber-50 px-3.5 py-2.5 text-[12px] leading-relaxed text-amber-800">
+        Akunmu sudah aktif untuk login, tetapi order baru bisa diterima setelah admin memverifikasi NIM & kampus.
+      </p>
+    </UiCard>
+
     <!-- Kendaraan -->
     <UiCard>
       <div class="flex items-center justify-between">
@@ -126,7 +162,7 @@ async function save() {
         <div class="rounded-xl bg-ink-50 p-3.5">
           <p class="text-[10px] text-ink-400 uppercase">Jenis</p>
           <p class="mt-0.5 flex items-center gap-1.5 text-sm font-bold text-ink-900">
-            <UiIcon :name="VEHICLES.find(v => v.value === profile?.vehicle_type)?.icon ?? 'car'" class="size-4" />
+            <UiIcon :name="VEHICLES.find(v => v.value === profile?.vehicle_type)?.icon ?? 'bike'" class="size-4" />
             {{ VEHICLES.find(v => v.value === profile?.vehicle_type)?.label ?? profile?.vehicle_type }}
           </p>
         </div>
@@ -166,8 +202,8 @@ async function save() {
         <UiInput
           v-model="form.vehicle_plate"
           label="Nomor kendaraan"
-          icon="car"
-          placeholder="B 1234 ABC"
+          icon="bike"
+          placeholder="F 1234 ABC"
           :error="errors.vehicle_plate"
         />
         <div class="grid gap-4 sm:grid-cols-2">

@@ -53,7 +53,7 @@ function openRide(code: string) {
   void conv
   void rideId
   toast.info('Membuka detail perjalanan…')
-  navigateTo(`/rider/rides?search=${code}`)
+  navigateTo(`/customer/rides?search=${code}`)
 }
 </script>
 
@@ -61,7 +61,7 @@ function openRide(code: string) {
   <div>
     <AppPageHeader title="Percakapan">
       <template #actions>
-        <UiButton to="/rider/chat" variant="ghost" size="sm">
+        <UiButton to="/customer/chat" variant="ghost" size="sm">
           <template #icon><UiIcon name="arrow-left" class="size-4" /></template>
           Semua chat
         </UiButton>

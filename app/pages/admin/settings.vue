@@ -14,8 +14,8 @@ const GROUP_META: Record<string, { title: string; description: string; icon: str
     icon: 'settings',
   },
   fare: {
-    title: 'Tarif',
-    description: 'Parameter dasar perhitungan tarif dan biaya layanan.',
+    title: 'Tarif Zona',
+    description: 'Aturan tarif per zona jarak (hijau, kuning, jingga, merah) beserta biaya admin.',
     icon: 'wallet',
   },
   ride: {
@@ -24,13 +24,13 @@ const GROUP_META: Record<string, { title: string; description: string; icon: str
     icon: 'navigation',
   },
   driver: {
-    title: 'Driver',
-    description: 'Standar kelayakan driver yang diterima.',
-    icon: 'car',
+    title: 'Driver Mahasiswa',
+    description: 'Standar kelayakan driver mahasiswa yang diterima.',
+    icon: 'bike',
   },
   payment: {
     title: 'Pembayaran',
-    description: 'Gateway pembayaran yang aktif digunakan.',
+    description: 'Metode pembayaran yang aktif (Tunai & QRIS).',
     icon: 'credit-card',
   },
   chat: {

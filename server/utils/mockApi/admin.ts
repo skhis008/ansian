@@ -26,7 +26,7 @@ import {
   paymentsForRide,
   rideWithRelations,
   userById,
-} from '#shared/mocks/db'
+} from './db'
 
 /** GET /api/v1/admin/stats */
 export async function stats(event: H3Event) {
@@ -43,10 +43,10 @@ export async function stats(event: H3Event) {
     total_rides: rides.length,
     rides_today: ridesToday.length,
     total_users: db.users.length,
-    riders: db.users.filter(u => u.role === 'rider').length,
+    customers: db.users.filter(u => u.role === 'customer').length,
     drivers: db.users.filter(u => u.role === 'driver').length,
     online_drivers: db.drivers.filter(d => d.status !== 'offline').length,
-    pending_drivers: db.users.filter(u => u.role === 'driver' && u.status === 'pending').length,
+    pending_drivers: db.drivers.filter(d => d.verification === 'pending').length,
     gmv_today: ridesToday.filter(r => r.status === 'completed').reduce((a, r) => a + r.fare, 0),
     gmv_month: gmv,
     revenue_today: revenue,
@@ -92,8 +92,6 @@ function revenueByVehicleType(): RevenueByVehicleType[] {
   const total = completed.reduce((a, r) => a + r.fare, 0) || 1
   const types: RevenueByVehicleType[] = [
     { vehicle_type: 'motorcycle', label: 'Motor', rides: 0, gmv: 0, percentage: 0 },
-    { vehicle_type: 'car', label: 'Mobil', rides: 0, gmv: 0, percentage: 0 },
-    { vehicle_type: 'van', label: 'Van', rides: 0, gmv: 0, percentage: 0 },
   ]
   for (const r of completed) {
     if (!r.driver_id) continue
@@ -154,7 +152,7 @@ export async function showUser(event: H3Event) {
   requireRole(event, 'admin')
   const id = Number(getRouterParam(event, 'user'))
   const user = findOr404(userById(id), 'Pengguna tidak ditemukan.')
-  const rides = db.rides.filter(r => r.rider_id === id)
+  const rides = db.rides.filter(r => r.customer_id === id)
   const profile = db.drivers.find(d => d.user_id === id)
   return resource({
     ...user,
@@ -177,7 +175,7 @@ export async function updateUser(event: H3Event) {
   if (body.name) user.name = String(body.name)
   if (body.email) user.email = String(body.email)
   if (body.phone) user.phone = String(body.phone)
-  if (body.role && ['rider', 'driver', 'admin'].includes(body.role)) user.role = body.role
+  if (body.role && ['customer', 'driver', 'admin'].includes(body.role)) user.role = body.role
   if (body.status && ['active', 'pending', 'suspended'].includes(body.status)) user.status = body.status
   user.updated_at = nowIso()
   return resource(user, { message: 'Pengguna diperbarui.' })
@@ -244,15 +242,37 @@ export async function adminUpdateDriver(event: H3Event) {
   }
   if (body.vehicle && typeof body.vehicle === 'object') {
     const v = body.vehicle as Record<string, unknown>
-    if (v.vehicle_type && ['motorcycle', 'car', 'van'].includes(String(v.vehicle_type))) {
+    if (v.vehicle_type && ['motorcycle'].includes(String(v.vehicle_type))) {
       driver.vehicle_type = v.vehicle_type as DriverProfile['vehicle_type']
     }
     if (v.vehicle_plate) driver.vehicle_plate = String(v.vehicle_plate)
     if (v.vehicle_color) driver.vehicle_color = String(v.vehicle_color)
     if (v.vehicle_model) driver.vehicle_model = String(v.vehicle_model)
   }
+  if (body.student_id) driver.student_id = String(body.student_id)
+  if (body.campus) driver.campus = String(body.campus)
+  if (body.study_program) driver.study_program = String(body.study_program)
 
   return resource(driverById(driver.id)!, { message: 'Data driver diperbarui.' })
+}
+
+/** POST /api/v1/admin/drivers/{driver}/verify — verifikasi status mahasiswa */
+export async function verifyDriver(event: H3Event) {
+  requireRole(event, 'admin')
+  const id = Number(getRouterParam(event, 'driver'))
+  const driver = findOr404(
+    db.drivers.find(d => d.id === id),
+    'Driver tidak ditemukan.',
+  )
+  const body = await readPayload(event)
+  if (!['verified', 'rejected', 'pending'].includes(String(body.verification))) {
+    throw createError({ statusCode: 422, data: { message: 'Status verifikasi tidak valid.' } })
+  }
+  driver.verification = body.verification as DriverProfile['verification']
+  const user = db.users.find(u => u.id === driver.user_id)
+  if (user) user.updated_at = nowIso()
+  const label = driver.verification === 'verified' ? 'Terverifikasi' : driver.verification === 'rejected' ? 'Ditolak' : 'Menunggu verifikasi'
+  return resource(driverById(driver.id)!, { message: `Status driver: ${label}.` })
 }
 
 /** GET /api/v1/admin/payments — semua transaksi lintas pengguna */
@@ -265,21 +285,20 @@ export async function adminListPayments(event: H3Event) {
       return {
         ...payment,
         ride_code: r.ride_code,
-        rider_name: userById(r.rider_id)?.name ?? '-',
+        customer_name: userById(r.customer_id)?.name ?? '-',
         driver_name: r.driver_id ? (driverById(r.driver_id)?.user.name ?? '-') : '-',
       }
     })
     .filter(Boolean) as Array<
-    Payment & { ride_code: string; rider_name: string; driver_name: string }
+    Payment & { ride_code: string; customer_name: string; driver_name: string }
   >
 
   const list = queryList(rows, event, {
-    search: ['reference', 'ride_code', 'rider_name', 'driver_name'],
-    match: (p, term) => p.rider_name.toLowerCase().includes(term) || p.driver_name.toLowerCase().includes(term),
+    search: ['reference', 'ride_code', 'customer_name', 'driver_name'],
+    match: (p, term) => p.customer_name.toLowerCase().includes(term) || p.driver_name.toLowerCase().includes(term),
     filters: {
       status: (p, v) => p.status === v,
       method: (p, v) => p.method === v,
-      gateway: (p, v) => p.gateway === v,
       date: (p, v) => p.created_at.slice(0, 10) === v,
     },
     sort: { created_at: 'desc', amount: 'desc' },
@@ -352,7 +371,7 @@ export async function adminActivity(event: H3Event) {
       ride_code: r.ride_code,
       status: r.status,
       fare: r.fare,
-      rider_name: userById(r.rider_id)?.name ?? '-',
+      customer_name: userById(r.customer_id)?.name ?? '-',
       driver_name: r.driver_id ? driverById(r.driver_id)?.user.name ?? '-' : '-',
       created_at: r.created_at,
     }))

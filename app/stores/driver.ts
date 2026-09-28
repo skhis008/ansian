@@ -143,7 +143,7 @@ export const useDriverStore = defineStore('driver', {
       }
     },
 
-    /** Broadcast lokasi driver untuk halaman rider yang melacak */
+    /** Broadcast lokasi driver untuk halaman customer yang melacak */
     applyRideLocation(payload: DriverLocationEvent) {
       this.trackingLocation = { lat: payload.lat, lng: payload.lng }
     },

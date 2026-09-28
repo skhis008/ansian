@@ -7,7 +7,17 @@ defineProps<{ quote: FareQuote | null; loading?: boolean; note?: string }>()
 
 <template>
   <div class="rounded-2xl border border-ink-200 bg-white p-4">
-    <h3 class="text-sm font-semibold text-ink-900">Rincian ongkos</h3>
+    <div class="flex items-center justify-between gap-2">
+      <h3 class="text-sm font-semibold text-ink-900">Rincian tarif</h3>
+      <span
+        v-if="quote"
+        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
+        :style="{ backgroundColor: `${quote.zone_color}1a`, color: quote.zone_color }"
+      >
+        <span class="size-2 rounded-full" :style="{ backgroundColor: quote.zone_color }" />
+        {{ quote.zone_label }}
+      </span>
+    </div>
 
     <div v-if="loading" class="mt-3 space-y-2">
       <UiSkeletonBlock v-for="i in 4" :key="i" :lines="1" height="h-3" />
@@ -16,23 +26,12 @@ defineProps<{ quote: FareQuote | null; loading?: boolean; note?: string }>()
     <template v-else-if="quote">
       <dl class="mt-3 space-y-2 text-sm">
         <div class="flex justify-between">
-          <dt class="text-ink-500">Tarif dasar</dt>
-          <dd class="font-medium text-ink-700">{{ formatRupiah(quote.base_fare) }}</dd>
+          <dt class="text-ink-500">Tarif zona {{ quote.zone_label }} ({{ formatDistance(quote.distance_km) }})</dt>
+          <dd class="font-medium text-ink-700">{{ formatRupiah(quote.zone_fare) }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-ink-500">Ongkos jarak ({{ formatDistance(quote.distance_km) }})</dt>
-          <dd class="font-medium text-ink-700">{{ formatRupiah(quote.distance_fare) }}</dd>
-        </div>
-        <div v-if="quote.surge_fare > 0" class="flex justify-between text-amber-600">
-          <dt class="flex items-center gap-1">
-            <UiIcon name="zap" class="size-3.5" />
-            Lonjakan ({{ quote.surge_multiplier }}×)
-          </dt>
-          <dd class="font-semibold">+{{ formatRupiah(quote.surge_fare) }}</dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-ink-500">Biaya layanan</dt>
-          <dd class="font-medium text-ink-700">{{ formatRupiah(quote.service_fee) }}</dd>
+          <dt class="text-ink-500">Biaya admin</dt>
+          <dd class="font-medium text-ink-700">{{ formatRupiah(quote.admin_fee) }}</dd>
         </div>
       </dl>
 
@@ -56,7 +55,7 @@ defineProps<{ quote: FareQuote | null; loading?: boolean; note?: string }>()
     </template>
 
     <p v-else class="mt-3 text-sm text-ink-400">
-      Isi titik penjemputan dan tujuan untuk melihat estimasi ongkos.
+      Isi titik penjemputan dan tujuan untuk melihat estimasi tarif.
     </p>
   </div>
 </template>

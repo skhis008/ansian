@@ -6,8 +6,6 @@ const props = defineProps<{ driver: Driver; distanceKm?: number; eta?: number; c
 
 const VEHICLE: Record<Driver['vehicle_type'], { label: string; icon: string }> = {
   motorcycle: { label: 'Motor', icon: 'bike' },
-  car: { label: 'Mobil', icon: 'car' },
-  van: { label: 'Van', icon: 'briefcase' },
 }
 </script>
 

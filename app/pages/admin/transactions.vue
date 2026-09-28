@@ -25,16 +25,35 @@ type AdminPayment = {
   id: number
   ride_id: number
   ride_code: string
-  gateway: string
   method: PaymentMethod
   amount: number
   status: PaymentStatus
   reference: string
-  checkout_url: string | null
   paid_at: string | null
   created_at: string
-  rider_name: string
+  customer_name: string
   driver_name: string
+}
+
+const marking = ref(false)
+
+/** Mock konfirmasi QRIS manual (pada produksi: webhook backend) */
+async function markPaid() {
+  if (!detail.value) return
+  marking.value = true
+  try {
+    await http.post('/payments/webhook', {
+      reference: detail.value.reference,
+      transaction_status: 'settlement',
+    })
+    toast.success('Pembayaran ditandai lunas.')
+    detail.value = null
+    await refresh()
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : 'Gagal menandai pembayaran.')
+  } finally {
+    marking.value = false
+  }
 }
 
 const { data, pending, refresh } = await useAsyncData(
@@ -127,9 +146,8 @@ const detail = ref<AdminPayment | null>(null)
             <tr class="border-b border-ink-100 text-[11px] tracking-wide text-ink-400 uppercase">
               <th class="px-4 py-3 font-semibold">Referensi</th>
               <th class="px-3 py-3 font-semibold">Perjalanan</th>
-              <th class="px-3 py-3 font-semibold">Penumpang</th>
+              <th class="px-3 py-3 font-semibold">Pelanggan</th>
               <th class="px-3 py-3 font-semibold">Metode</th>
-              <th class="px-3 py-3 font-semibold">Gateway</th>
               <th class="px-3 py-3 font-semibold">Status</th>
               <th class="px-3 py-3 text-right font-semibold">Nominal</th>
               <th class="px-4 py-3 text-right font-semibold">Dibuat</th>
@@ -145,11 +163,10 @@ const detail = ref<AdminPayment | null>(null)
               <td class="px-4 py-3 font-mono text-[12px] text-ink-700">{{ p.reference }}</td>
               <td class="px-3 py-3 font-mono text-[12px] text-ink-600">{{ p.ride_code }}</td>
               <td class="px-3 py-3">
-                <p class="text-[12.5px] text-ink-700">{{ p.rider_name }}</p>
+                <p class="text-[12.5px] text-ink-700">{{ p.customer_name }}</p>
                 <p class="text-[11px] text-ink-400">{{ p.driver_name }}</p>
               </td>
               <td class="px-3 py-3 text-[12.5px] text-ink-700">{{ PAYMENT_METHOD_LABELS[p.method] }}</td>
-              <td class="px-3 py-3 text-[12px] text-ink-500">{{ p.gateway }}</td>
               <td class="px-3 py-3">
                 <UiBadge :tone="STATUS_TONES[p.status]" size="sm" dot>{{ PAYMENT_STATUS_LABELS[p.status] }}</UiBadge>
               </td>
@@ -186,16 +203,12 @@ const detail = ref<AdminPayment | null>(null)
           <dd class="mt-0.5 font-semibold text-ink-800">{{ PAYMENT_METHOD_LABELS[detail.method] }}</dd>
         </div>
         <div>
-          <dt class="text-ink-400">Gateway</dt>
-          <dd class="mt-0.5 font-semibold text-ink-800">{{ detail.gateway }}</dd>
-        </div>
-        <div>
           <dt class="text-ink-400">Kode Perjalanan</dt>
           <dd class="mt-0.5 font-mono font-semibold text-ink-800">{{ detail.ride_code }}</dd>
         </div>
         <div>
-          <dt class="text-ink-400">Penumpang</dt>
-          <dd class="mt-0.5 font-semibold text-ink-800">{{ detail.rider_name }}</dd>
+          <dt class="text-ink-400">Pelanggan</dt>
+          <dd class="mt-0.5 font-semibold text-ink-800">{{ detail.customer_name }}</dd>
         </div>
         <div>
           <dt class="text-ink-400">Driver</dt>
@@ -213,8 +226,13 @@ const detail = ref<AdminPayment | null>(null)
 
       <template #footer>
         <UiButton variant="ghost" @click="detail = null">Tutup</UiButton>
-        <UiButton v-if="detail?.checkout_url" variant="outline" @click="toast.info('Tautan pembayaran dibuka di tab baru.')">
-          Buka Halaman Bayar
+        <UiButton
+          v-if="detail && (detail.status === 'unpaid' || detail.status === 'pending')"
+          variant="outline"
+          :loading="marking"
+          @click="markPaid"
+        >
+          Tandai Lunas
         </UiButton>
       </template>
     </UiModal>

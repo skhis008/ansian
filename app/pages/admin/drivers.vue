@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import type { Driver, Paginated } from '#shared/types'
+import type { Driver, Paginated, Verification } from '#shared/types'
+import { VERIFICATION_LABELS } from '#shared/types'
 import { formatRupiah, formatDateTime } from '#shared/utils/format'
 
 definePageMeta({ layout: 'app' })
@@ -34,8 +35,27 @@ const STATUS_TONES: Record<string, 'success' | 'gray' | 'warning'> = {
 }
 const VEHICLE_LABELS: Record<string, string> = {
   motorcycle: 'Motor',
-  car: 'Mobil',
-  van: 'Van',
+}
+
+const VERIFY_TONES: Record<Verification, 'success' | 'warning' | 'danger'> = {
+  verified: 'success',
+  pending: 'warning',
+  rejected: 'danger',
+}
+
+async function setVerification(value: Verification) {
+  if (!selected.value) return
+  saving.value = true
+  try {
+    await http.post(`/admin/drivers/${selected.value.id}/verify`, { verification: value })
+    toast.success(`Status verifikasi ${selected.value.user.name}: ${VERIFICATION_LABELS[value]}.`)
+    selected.value = null
+    await refresh()
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : 'Gagal memverifikasi driver.')
+  } finally {
+    saving.value = false
+  }
 }
 
 const selected = ref<Driver | null>(null)
@@ -68,7 +88,7 @@ async function applyStatus() {
 const summary = computed(() => {
   const list = rows.value
   return [
-    { label: 'Total Driver', value: list.length, icon: 'car', tone: 'bg-brand-50 text-brand-600' },
+    { label: 'Total Driver', value: list.length, icon: 'bike', tone: 'bg-brand-50 text-brand-600' },
     {
       label: 'Online',
       value: list.filter(d => d.status !== 'offline').length,
@@ -140,7 +160,7 @@ const summary = computed(() => {
       </div>
 
       <div v-else-if="!rows.length" class="p-4">
-        <AppEmptyState icon="car" title="Tidak ada driver" description="Ubah kata kunci atau filter status." />
+        <AppEmptyState icon="bike" title="Tidak ada driver" description="Ubah kata kunci atau filter status." />
       </div>
 
       <div v-else class="overflow-x-auto">
@@ -151,6 +171,7 @@ const summary = computed(() => {
               <th class="px-3 py-3 font-semibold">Kode</th>
               <th class="px-3 py-3 font-semibold">Kendaraan</th>
               <th class="px-3 py-3 font-semibold">Status</th>
+              <th class="px-3 py-3 font-semibold">Verifikasi</th>
               <th class="px-3 py-3 text-right font-semibold">Perjalanan</th>
               <th class="px-3 py-3 text-right font-semibold">Rating</th>
               <th class="px-3 py-3 text-right font-semibold">Pendapatan</th>
@@ -175,6 +196,9 @@ const summary = computed(() => {
               </td>
               <td class="px-3 py-3">
                 <UiBadge :tone="STATUS_TONES[d.status]" size="sm" dot>{{ d.status }}</UiBadge>
+              </td>
+              <td class="px-3 py-3">
+                <UiBadge :tone="VERIFY_TONES[d.verification]" size="sm">{{ VERIFICATION_LABELS[d.verification] }}</UiBadge>
               </td>
               <td class="px-3 py-3 text-right text-[12.5px] font-semibold text-ink-900">{{ d.total_rides }}</td>
               <td class="px-3 py-3 text-right">
@@ -247,6 +271,46 @@ const summary = computed(() => {
             <dd class="mt-0.5 font-semibold text-ink-800">{{ formatDateTime(selected.last_seen_at) }}</dd>
           </div>
         </dl>
+
+        <div class="rounded-xl border border-ink-200 p-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-[12.5px] font-bold text-ink-900">Verifikasi Mahasiswa</p>
+            <UiBadge :tone="VERIFY_TONES[selected.verification]" size="sm">{{ VERIFICATION_LABELS[selected.verification] }}</UiBadge>
+          </div>
+          <dl class="mt-3 grid grid-cols-3 gap-3 text-[12.5px]">
+            <div>
+              <dt class="text-ink-400">NIM</dt>
+              <dd class="mt-0.5 font-mono font-semibold text-ink-800">{{ selected.student_id || '-' }}</dd>
+            </div>
+            <div>
+              <dt class="text-ink-400">Kampus</dt>
+              <dd class="mt-0.5 font-semibold text-ink-800">{{ selected.campus || '-' }}</dd>
+            </div>
+            <div>
+              <dt class="text-ink-400">Prodi</dt>
+              <dd class="mt-0.5 font-semibold text-ink-800">{{ selected.study_program || '-' }}</dd>
+            </div>
+          </dl>
+          <div class="mt-3 flex gap-2">
+            <UiButton
+              size="sm"
+              :loading="saving"
+              :disabled="selected.verification === 'verified'"
+              @click="setVerification('verified')"
+            >
+              Verifikasi
+            </UiButton>
+            <UiButton
+              size="sm"
+              variant="outline"
+              :loading="saving"
+              :disabled="selected.verification === 'rejected'"
+              @click="setVerification('rejected')"
+            >
+              Tolak
+            </UiButton>
+          </div>
+        </div>
 
         <label class="block">
           <span class="mb-1.5 block text-[12.5px] font-medium text-ink-700">Ubah status ketersediaan</span>

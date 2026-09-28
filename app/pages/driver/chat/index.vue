@@ -44,7 +44,7 @@ function openRide(code: string) {
 
 <template>
   <div class="space-y-4">
-    <AppPageHeader title="Chat" description="Percakapan dengan penumpang.">
+    <AppPageHeader title="Chat" description="Percakapan dengan pelanggan.">
       <template #actions>
         <UiBadge tone="gray">{{ chat.conversations.length }} percakapan</UiBadge>
       </template>

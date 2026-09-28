@@ -104,7 +104,7 @@ async function save() {
             <tr class="border-b border-ink-100 text-[11px] tracking-wide text-ink-400 uppercase">
               <th class="px-4 py-3 font-semibold">Kode</th>
               <th class="px-3 py-3 font-semibold">Rute</th>
-              <th class="px-3 py-3 font-semibold">Penumpang</th>
+              <th class="px-3 py-3 font-semibold">Pelanggan</th>
               <th class="px-3 py-3 font-semibold">Driver</th>
               <th class="px-3 py-3 font-semibold">Status</th>
               <th class="px-3 py-3 font-semibold">Bayar</th>
@@ -122,7 +122,7 @@ async function save() {
                 <p class="truncate text-[12.5px] text-ink-700">{{ r.pickup.place_name ?? r.pickup.address }}</p>
                 <p class="truncate text-[11px] text-ink-400">ke {{ r.destination.place_name ?? r.destination.address }}</p>
               </td>
-              <td class="px-3 py-3 text-[12.5px] text-ink-700">{{ r.rider?.name ?? '-' }}</td>
+              <td class="px-3 py-3 text-[12.5px] text-ink-700">{{ r.customer?.name ?? '-' }}</td>
               <td class="px-3 py-3 text-[12.5px] text-ink-500">{{ r.driver?.user?.name ?? '-' }}</td>
               <td class="px-3 py-3"><RideStatusBadge :status="r.status" size="sm" /></td>
               <td class="px-3 py-3">
@@ -186,7 +186,7 @@ async function save() {
           </select>
         </label>
         <p class="text-[11.5px] text-ink-400">
-          Perubahan status manual dicatat di riwayat perjalanan dan dikirim ke penumpang serta driver terkait.
+          Perubahan status manual dicatat di riwayat perjalanan dan dikirim ke pelanggan serta driver terkait.
         </p>
       </div>
 

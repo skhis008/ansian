@@ -3,19 +3,19 @@ import type { Ride } from '#shared/types'
 import { formatDateTime, formatDistance, formatDuration, formatRupiah } from '#shared/utils/format'
 
 const props = withDefaults(
-  defineProps<{ ride: Ride; clickable?: boolean; showDriver?: boolean; showRider?: boolean }>(),
-  { clickable: true, showDriver: false, showRider: false },
+  defineProps<{ ride: Ride; clickable?: boolean; showDriver?: boolean; showCustomer?: boolean }>(),
+  { clickable: true, showDriver: false, showCustomer: false },
 )
 
 const counterpartName = computed(() =>
-  props.showDriver ? (props.ride.driver?.user.name ?? 'Mencari driver…') : props.showRider ? (props.ride.rider?.name ?? '-') : null,
+  props.showDriver ? (props.ride.driver?.user.name ?? 'Mencari driver…') : props.showCustomer ? (props.ride.customer?.name ?? '-') : null,
 )
 </script>
 
 <template>
   <component
     :is="clickable ? resolveComponent('NuxtLink') : 'div'"
-    :to="clickable ? `/rider/rides/${ride.id}` : undefined"
+    :to="clickable ? `/customer/rides/${ride.id}` : undefined"
     class="group flex gap-3.5 rounded-2xl border border-ink-200/80 bg-white p-4 transition"
     :class="clickable ? 'hover:border-brand-300 hover:shadow-soft' : ''"
   >
@@ -46,10 +46,6 @@ const counterpartName = computed(() =>
         <span class="inline-flex items-center gap-1">
           <UiIcon name="clock" class="size-3.5" />
           {{ formatDuration(ride.duration_min) }}
-        </span>
-        <span v-if="ride.surge_multiplier > 1" class="inline-flex items-center gap-1 font-semibold text-amber-600">
-          <UiIcon name="zap" class="size-3.5" />
-          {{ ride.surge_multiplier }}×
         </span>
         <span class="inline-flex items-center gap-1">
           <UiIcon name="history" class="size-3.5" />

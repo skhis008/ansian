@@ -35,29 +35,30 @@
       <div class="relative flex h-full flex-col justify-center px-14 py-16">
         <blockquote class="max-w-md">
           <p class="text-2xl leading-relaxed font-semibold text-white">
-            “Pakai AntarJemput tiap hari. Makin hemat, driver datang sesuai doorstep.”
+            “Tarifnya jelas dari awal, jadi hemat buat jalan-jalan. Ngajar les sambil jadi driver juga gampang —
+            tinggal nyalain online sepulang kuliah.”
           </p>
           <footer class="mt-6 flex items-center gap-3">
             <UiAvatar name="Rani Kusuma" :size="40" />
             <div>
               <p class="text-sm font-semibold text-white">Rani Kusuma</p>
-              <p class="text-xs text-white/60">Penumpang sejak 2024</p>
+              <p class="text-xs text-white/60">Mahasiswa & driver Ansian</p>
             </div>
           </footer>
         </blockquote>
 
         <dl class="mt-14 grid max-w-md grid-cols-3 gap-6 border-t border-white/10 pt-8">
           <div>
-            <dt class="text-xs text-white/50">Perjalanan</dt>
-            <dd class="mt-1 text-2xl font-bold text-white">120k+</dd>
+            <dt class="text-xs text-white/50">Tarif mulai</dt>
+            <dd class="mt-1 text-2xl font-bold text-white">Rp4.500</dd>
           </div>
           <div>
-            <dt class="text-xs text-white/50">Driver</dt>
-            <dd class="mt-1 text-2xl font-bold text-white">3.4k</dd>
+            <dt class="text-xs text-white/50">Zona tarif</dt>
+            <dd class="mt-1 text-2xl font-bold text-white">4</dd>
           </div>
           <div>
-            <dt class="text-xs text-white/50">Rating</dt>
-            <dd class="mt-1 text-2xl font-bold text-white">4.8</dd>
+            <dt class="text-xs text-white/50">Biaya tersembunyi</dt>
+            <dd class="mt-1 text-2xl font-bold text-white">Rp0</dd>
           </div>
         </dl>
       </div>

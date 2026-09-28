@@ -11,7 +11,7 @@
 
 /* ---------- Enums (harus sama dengan value di Laravel) ---------- */
 
-export const USER_ROLES = ['rider', 'driver', 'admin'] as const
+export const USER_ROLES = ['customer', 'driver', 'admin'] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
 export const USER_STATUSES = ['active', 'pending', 'suspended'] as const
@@ -20,7 +20,7 @@ export type UserStatus = (typeof USER_STATUSES)[number]
 export const DRIVER_STATUSES = ['offline', 'idle', 'busy'] as const
 export type DriverStatus = (typeof DRIVER_STATUSES)[number]
 
-export const VEHICLE_TYPES = ['motorcycle', 'car', 'van'] as const
+export const VEHICLE_TYPES = ['motorcycle'] as const
 export type VehicleType = (typeof VEHICLE_TYPES)[number]
 
 export const RIDE_STATUSES = [
@@ -44,15 +44,12 @@ export const RIDE_STATUS_LABELS: Record<RideStatus, string> = {
   failed: 'Gagal',
 }
 
-export const PAYMENT_METHODS = ['cash', 'wallet', 'qris', 'midtrans', 'xendit'] as const
+export const PAYMENT_METHODS = ['cash', 'qris'] as const
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number]
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   cash: 'Tunai',
-  wallet: 'Dompet',
   qris: 'QRIS',
-  midtrans: 'Midtrans',
-  xendit: 'Xendit',
 }
 
 export const PAYMENT_STATUSES = ['unpaid', 'pending', 'paid', 'refunded', 'failed'] as const
@@ -80,18 +77,25 @@ export const DRIVER_STATUS_LABELS: Record<DriverStatus, string> = {
 
 export const VEHICLE_TYPE_LABELS: Record<VehicleType, string> = {
   motorcycle: 'Motor',
-  car: 'Mobil',
-  van: 'Van',
+}
+
+export const VERIFICATIONS = ['pending', 'verified', 'rejected'] as const
+export type Verification = (typeof VERIFICATIONS)[number]
+
+export const VERIFICATION_LABELS: Record<Verification, string> = {
+  pending: 'Menunggu Verifikasi',
+  verified: 'Terverifikasi',
+  rejected: 'Ditolak',
 }
 
 export const SERVICE_TYPES = ['instant', 'scheduled'] as const
 export type ServiceType = (typeof SERVICE_TYPES)[number]
 
 export const CANCEL_REASONS = [
-  'rider_cancel',
+  'customer_cancel',
   'driver_cancel',
   'no_driver',
-  'rider_no_show',
+  'customer_no_show',
   'driver_no_show',
   'wrong_address',
   'other',
@@ -174,6 +178,11 @@ export interface DriverProfile {
   user_id: number
   driver_code: string
   status: DriverStatus
+  /** Data mahasiswa — wajib untuk driver (khusus mahasiswa) */
+  student_id: string
+  campus: string
+  study_program: string
+  verification: Verification
   vehicle_type: VehicleType
   vehicle_plate: string
   vehicle_color: string
@@ -223,13 +232,12 @@ export interface Ride {
   distance_km: number
   duration_min: number
   fare: number
-  surge_multiplier: number
   payment_method: PaymentMethod
   payment_status: PaymentStatus
   cancel_reason: CancelReason | null
-  rider_id: number
+  customer_id: number
   driver_id: number | null
-  rider?: User
+  customer?: User
   driver?: Driver | null
   rating?: RideRating | null
   status_histories: RideStatusHistory[]
@@ -242,15 +250,15 @@ export interface Ride {
 }
 
 export interface FareQuote {
+  zone: 'green' | 'yellow' | 'orange' | 'red'
+  zone_label: string
+  zone_color: string
   distance_km: number
   duration_min: number
-  base_fare: number
-  distance_fare: number
-  surge_fare: number
-  service_fee: number
+  zone_fare: number
+  admin_fee: number
   total: number
   currency: string
-  surge_multiplier: number
   route?: LatLng[]
   nearest_drivers: number
 }
@@ -258,14 +266,21 @@ export interface FareQuote {
 export interface Payment {
   id: number
   ride_id: number
-  gateway: 'midtrans' | 'xendit' | 'manual'
   method: PaymentMethod
   amount: number
   status: PaymentStatus
   reference: string
-  checkout_url: string | null
   paid_at: string | null
   created_at: string
+}
+
+/** Tantangan kode verifikasi email (OTP 6 digit) — response register/login */
+export interface AuthChallenge {
+  challenge_id: string
+  email_masked: string
+  expires_in: number
+  /** Hanya dikirim pada mode mock/dev (tanpa SMTP) — production Laravel tidak mengirim field ini */
+  dev_code?: string
 }
 
 /* ---------- Chat ---------- */
@@ -314,7 +329,7 @@ export interface DashboardStats {
   total_rides: number
   rides_today: number
   total_users: number
-  riders: number
+  customers: number
   drivers: number
   online_drivers: number
   pending_drivers: number
@@ -382,9 +397,8 @@ export interface DriverJob {
   distance_km: number
   duration_min: number
   fare: number
-  surge_multiplier: number
-  rider_name: string
-  rider_rating: number
+  customer_name: string
+  customer_rating: number
   distance_to_pickup_km: number
   expires_in_seconds: number
   created_at: string

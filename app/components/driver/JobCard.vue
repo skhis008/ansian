@@ -51,10 +51,6 @@ async function accept() {
         <div class="min-w-0">
           <div class="flex items-center gap-2">
             <p class="font-mono text-xs font-bold text-ink-700">{{ job.ride_code }}</p>
-            <UiBadge v-if="job.surge_multiplier > 1" tone="warning" size="xs">
-              <UiIcon name="zap" class="size-2.5" />
-              {{ job.surge_multiplier }}×
-            </UiBadge>
           </div>
           <p class="mt-1.5 flex items-center gap-1.5 text-sm font-semibold text-ink-900">
             <span class="size-2 shrink-0 rounded-full border-2 border-ink-900" />
@@ -83,7 +79,7 @@ async function accept() {
         </span>
         <span class="inline-flex items-center gap-1">
           <UiIcon name="user" class="size-3" />
-          {{ job.rider_name }} · {{ job.rider_rating }}
+          {{ job.customer_name }} · {{ job.customer_rating }}
         </span>
         <span
           class="ml-auto inline-flex items-center gap-1 font-semibold"

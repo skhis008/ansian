@@ -229,7 +229,7 @@ export function useRealtime() {
     bindRide,
     bindAdmin,
     sendLocation: (driverId: number, lat: number, lng: number, heading = 0) => {
-      // Kirim lokasi via REST; channel hanya untuk broadcast ke rider
+      // Kirim lokasi via REST; channel hanya untuk broadcast ke customer
       void http.post('/drivers/me/location', { lat, lng, heading }).catch(() => undefined)
       void driverId
     },

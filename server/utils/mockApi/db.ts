@@ -1,3 +1,4 @@
+import { calculateZoneFare } from '#shared/utils/pricing'
 import type {
   AppNotification,
   ChartPoint,
@@ -20,19 +21,19 @@ import type {
  * ride_status_histories, conversations, messages, notifications, payments, settings).
  */
 
-export const CENTER = { lat: -6.208763, lng: 106.8456 }
+export const CENTER = { lat: -6.982835, lng: 110.409352 }
 
 const PLACES = [
-  { lat: -6.175392, lng: 106.827153, address: 'Monas, Medan Barat, Jakarta Pusat', place_name: 'Monas' },
-  { lat: -6.1944, lng: 106.8229, address: 'Jl. Jend. Sudirman No.1, Jakarta Pusat', place_name: 'Grand Indonesia' },
-  { lat: -6.2305, lng: 106.8003, address: 'Jl. MH Thamrin No.1, Jakarta Pusat', place_name: 'Tanah Abang' },
-  { lat: -6.1447, lng: 106.8261, address: 'Jl. Kuningan No.5, Jakarta Selatan', place_name: 'Kuningan' },
-  { lat: -6.2615, lng: 106.8106, address: 'Jl. Pangeran Antasari No.36, Jakarta Selatan', place_name: 'Kemang Village' },
-  { lat: -6.2, lng: 106.816666, address: 'Jl. Jenderal Sudirman Kav. 52, Jakarta Pusat', place_name: 'Sudirman' },
-  { lat: -6.1256, lng: 106.7298, address: 'Jl. Kasih Kemal No.3, Jakarta Barat', place_name: 'Kasih Kemal' },
-  { lat: -6.2426, lng: 106.8004, address: 'Jl. Sabang, Jakarta Selatan', place_name: 'Sabang' },
-  { lat: -6.2197, lng: 106.8195, address: 'Jl. Cikini Raya No.9, Jakarta Pusat', place_name: 'Cikini' },
-  { lat: -6.1497, lng: 106.8261, address: 'Jl. Tebet Barat Dalam No.88, Jakarta Selatan', place_name: 'Tebet' },
+  { lat: -6.982835, lng: 110.409352, address: 'Kampus Udinus, Pendrikan Kidul, Semarang Tengah', place_name: 'Kampus Udinus' },
+  { lat: -6.9913, lng: 110.4163, address: 'Simpang Lima, Semarang', place_name: 'Simpang Lima' },
+  { lat: -6.9789, lng: 110.4168, address: 'Jl. Pandanaran, Semarang', place_name: 'Pandanaran' },
+  { lat: -6.9735, lng: 110.4287, address: 'Sriwawansari, Semarang Tengah', place_name: 'Sriwawansari' },
+  { lat: -6.9944, lng: 110.4064, address: 'Stasiun Tawang, Semarang', place_name: 'Stasiun Tawang' },
+  { lat: -6.9727, lng: 110.3767, address: 'Bandara Ahmad Yani, Semarang', place_name: 'Bandara Ahmad Yani' },
+  { lat: -6.9663, lng: 110.4638, address: 'Genuk, Semarang Timur', place_name: 'Genuk' },
+  { lat: -6.9881, lng: 110.3932, address: 'Salaman Mloyo, Semarang Barat', place_name: 'Salaman Mloyo' },
+  { lat: -6.9688, lng: 110.4161, address: 'Kotabaru, Semarang', place_name: 'Kotabaru' },
+  { lat: -6.9978, lng: 110.4227, address: 'Bandarharjo, Semarang Utara', place_name: 'Bandarharjo' },
 ]
 
 const FIRST = ['Ahmad', 'Budi', 'Candra', 'Dewi', 'Eko', 'Fajar', 'Galih', 'Hendra', 'Indra', 'Joko', 'Kevin', 'Lukman', 'Miko', 'Nanda', 'Oscar', 'Putra', 'Rizky', 'Satria', 'Taufik', 'Umar']
@@ -75,9 +76,9 @@ function buildUsers(): User[] {
   users.push({
     id: 1,
     name: 'Rani Kusuma',
-    email: 'rider@antarjemput.id',
+    email: 'customer@ansian.id',
     phone: '081234567890',
-    role: 'rider',
+    role: 'customer',
     avatar_url: AVATAR_SVG('Rani Kusuma', 220),
     status: 'active',
     rating: null,
@@ -91,7 +92,7 @@ function buildUsers(): User[] {
   users.push({
     id: 2,
     name: 'Dimas Anggara',
-    email: 'driver@antarjemput.id',
+    email: 'driver@ansian.id',
     phone: '081298765432',
     role: 'driver',
     avatar_url: AVATAR_SVG('Dimas Anggara', 160),
@@ -106,11 +107,11 @@ function buildUsers(): User[] {
 
   users.push({
     id: 3,
-    name: 'Admin AntarJemput',
-    email: 'admin@antarjemput.id',
+    name: 'Admin Ansian',
+    email: 'admin@ansian.id',
     phone: '08111222333',
     role: 'admin',
-    avatar_url: AVATAR_SVG('Admin AntarJemput', 265),
+    avatar_url: AVATAR_SVG('Admin Ansian', 265),
     status: 'active',
     rating: null,
     rating_count: 0,
@@ -127,9 +128,9 @@ function buildUsers(): User[] {
     users.push({
       id,
       name,
-      email: `${isDriver ? 'driver' : 'rider'}${id}@antarjemput.id`,
+      email: `${isDriver ? 'driver' : 'customer'}${id}@ansian.id`,
       phone: `0812${String(1000000 + i * 137).slice(0, 8)}`,
-      role: isDriver ? 'driver' : 'rider',
+      role: isDriver ? 'driver' : 'customer',
       avatar_url: AVATAR_SVG(name, (i * 37) % 360),
       status: i % 17 === 0 ? 'suspended' : i % 11 === 0 ? 'pending' : 'active',
       rating: isDriver ? Number((4.5 + ((i * 13) % 50) / 100).toFixed(2)) : null,
@@ -148,9 +149,10 @@ function buildUsers(): User[] {
 const VEHICLES: { type: VehicleType; models: string[]; colors: string[] }[] = [
   { type: 'motorcycle', models: ['Honda Beat', 'Yamaha Mio', 'Honda Vario 160', 'Suzuki Smash'], colors: ['Hitam', 'Merah', 'Biru', 'Putih'] },
   { type: 'motorcycle', models: ['Yamaha NMAX', 'Honda PCX', 'Scoopy Prestige'], colors: ['Hitam', 'Cokelat', 'Abu-abu'] },
-  { type: 'car', models: ['Toyota Avanza', 'Daihatsu Xenia', 'Mitsubishi Xpander'], colors: ['Silver', 'Putih', 'Hitam'] },
-  { type: 'van', models: ['Toyota Hiace', 'Mitsubishi L300'], colors: ['Putih', 'Silver'] },
 ]
+
+const CAMPUSES = ['Universitas Dian Nuswantoro', 'Universitas Dian Nuswantoro', 'Universitas Dian Nuswantoro', 'Universitas Diponegoro', 'Politeknik Negeri Semarang', 'UIN Walisongo']
+const PROGRAMS = ['Teknik Informatika', 'Sistem Informasi', 'Manajemen', 'Desain Komunikasi Visual', 'Akuntansi', 'Ilmu Komunikasi', 'Teknik Elektro']
 
 function buildDriverProfiles(users: User[]): DriverProfile[] {
   const drivers: DriverProfile[] = []
@@ -158,7 +160,7 @@ function buildDriverProfiles(users: User[]): DriverProfile[] {
 
   driverUsers.forEach((u, i) => {
     const spec = VEHICLES[i % VEHICLES.length]!
-    const plate = `${['B', 'B', 'F', 'D'][i % 4]} ${String(1000 + i * 37).slice(0, 4)} ${['ABC', 'QWE', 'ZXC', 'KLM'][i % 4]}`
+    const plate = `F ${String(1000 + i * 37).slice(0, 4)} ${['ABC', 'QWE', 'ZXC', 'KLM'][i % 4]}`
     const status = i === 0 ? 'busy' : i < 14 ? 'idle' : i < 18 ? 'busy' : 'offline'
     const p = PLACES[(i * 5) % PLACES.length]!
     drivers.push({
@@ -166,6 +168,10 @@ function buildDriverProfiles(users: User[]): DriverProfile[] {
       user_id: u.id,
       driver_code: `DRV-${String(1001 + i)}`,
       status,
+      student_id: `A11.202${(i % 4) + 1}.${String(1000 + i * 73).slice(0, 4)}`,
+      campus: CAMPUSES[i % CAMPUSES.length]!,
+      study_program: PROGRAMS[i % PROGRAMS.length]!,
+      verification: i === 0 ? 'verified' : i % 7 === 5 ? 'rejected' : i % 5 === 0 ? 'pending' : 'verified',
       vehicle_type: spec.type,
       vehicle_plate: plate,
       vehicle_color: spec.colors[i % spec.colors.length]!,
@@ -190,19 +196,18 @@ const STATUS_FLOW: Ride['status'][] = ['searching', 'driver_assigned', 'driver_a
 
 function buildRides(users: User[], drivers: DriverProfile[]): Ride[] {
   const rides: Ride[] = []
-  const riders = users.filter(u => u.role === 'rider')
+  const customers = users.filter(u => u.role === 'customer')
   const rnd = seeded(42)
   const ACTIVE: Ride['status'][] = ['searching', 'driver_assigned', 'driver_arrived', 'in_progress']
-  /* Satu penumpang hanya boleh punya satu perjalanan aktif. */
-  const activeRiderIds = new Set<number>()
+  /* Satu customer hanya boleh punya satu perjalanan aktif. */
+  const activeCustomerIds = new Set<number>()
 
   for (let i = 0; i < 64; i++) {
     const pickup = PLACES[i % PLACES.length]!
     const dest = PLACES[(i * 3 + 4) % PLACES.length]!
     const distance = Number((1.2 + rnd() * 18).toFixed(1))
     const duration = Math.round((distance / 24) * 60 + 2)
-    const surge = i % 9 === 0 ? 1.4 : i % 5 === 0 ? 1.2 : 1
-    const fare = Math.max(8000, Math.round((5000 + distance * 2500 + duration * 150) * surge + (5000 + distance * 2500 + duration * 150) * surge * 0.08))
+    const fare = calculateZoneFare(distance).total
 
     let status: Ride['status']
     if (i === 0) status = 'searching'
@@ -218,11 +223,11 @@ function buildRides(users: User[], drivers: DriverProfile[]): Ride[] {
     /* Demo: driver pertama menerima perjalanan assigned, passenger pertama yang searching. */
     const driver = status === 'searching' ? null : drivers[status === 'driver_assigned' ? 0 : i % drivers.length]!
     const isActive = ACTIVE.includes(status)
-    let rider = riders[i % riders.length]!
+    let customer = customers[i % customers.length]!
     if (isActive) {
-      const free = riders.find(r => !activeRiderIds.has(r.id))
-      if (free) rider = free
-      activeRiderIds.add(rider.id)
+      const free = customers.find(r => !activeCustomerIds.has(r.id))
+      if (free) customer = free
+      activeCustomerIds.add(customer.id)
     }
     const completed = status === 'completed'
 
@@ -243,14 +248,14 @@ function buildRides(users: User[], drivers: DriverProfile[]): Ride[] {
       histories.push({
         id: i * 10 + 9,
         status,
-        note: status === 'cancelled' ? 'Dibatalkan oleh penumpang' : 'Tidak ada driver yang menerima',
+        note: status === 'cancelled' ? 'Dibatalkan oleh pelanggan' : 'Tidak ada driver yang menerima',
         created_at: hoursAgo(Math.max(0.01, createdHoursAgo - 0.4)),
       })
     }
 
     rides.push({
       id: 1000 + i,
-      ride_code: `AJ-${String(2609000 + i)}`,
+      ride_code: `ASN-${String(2609000 + i)}`,
       status,
       service_type: i % 7 === 0 ? 'scheduled' : 'instant',
       scheduled_at: i % 7 === 0 ? hoursAhead(2 + i) : null,
@@ -260,11 +265,10 @@ function buildRides(users: User[], drivers: DriverProfile[]): Ride[] {
       distance_km: distance,
       duration_min: duration,
       fare,
-      surge_multiplier: surge,
-      payment_method: (['cash', 'qris', 'midtrans', 'wallet', 'xendit'] as const)[i % 5]!,
-      payment_status: completed ? 'paid' : status === 'cancelled' ? 'refunded' : 'unpaid',
-      cancel_reason: status === 'cancelled' ? 'rider_cancel' : status === 'failed' ? 'no_driver' : null,
-      rider_id: rider.id,
+      payment_method: (['cash', 'qris'] as const)[i % 2]!,
+      payment_status: completed ? 'paid' : status === 'cancelled' ? 'refunded' : i % 2 === 1 ? 'pending' : 'unpaid',
+      cancel_reason: status === 'cancelled' ? 'customer_cancel' : status === 'failed' ? 'no_driver' : null,
+      customer_id: customer.id,
       driver_id: driver?.id ?? null,
       status_histories: histories,
       started_at: step >= 3 ? hoursAgo(Math.max(0.01, createdHoursAgo - 0.5)) : null,
@@ -334,8 +338,8 @@ function buildConversations(users: User[], rides: Ride[]): { convs: Conversation
     ride_code: null,
     counterpart: {
       id: 3,
-      name: 'Bantuan AntarJemput',
-      email: 'support@antarjemput.id',
+      name: 'Bantuan Ansian',
+      email: 'support@ansian.id',
       phone: '1500450',
       role: 'admin',
       avatar_url: null,
@@ -351,7 +355,7 @@ function buildConversations(users: User[], rides: Ride[]): { convs: Conversation
       id: msgId++,
       conversation_id: 7,
       sender_id: 3,
-      sender_name: 'Bantuan AntarJemput',
+      sender_name: 'Bantuan Ansian',
       is_mine: true,
       body: 'Halo! Ada yang bisa kami bantu?',
       type: 'text',
@@ -388,8 +392,8 @@ function buildNotifications(rides: Ride[]): AppNotification[] {
       id: 2,
       type: 'promo',
       title: 'Diskon 30% untuk 3 perjalanan',
-      body: 'Gunakan kode AJHEMAT30 sebelum 30 September.',
-      data: { code: 'AJHEMAT30' },
+      body: 'Gunakan kode ANSIAN30 sebelum 30 September.',
+      data: { code: 'ANSIAN30' },
       read_at: null,
       created_at: hoursAgo(2),
     },
@@ -418,17 +422,24 @@ function buildNotifications(rides: Ride[]): AppNotification[] {
 
 function buildSettings(): SystemSetting[] {
   return [
-    { key: 'app.name', value: 'AntarJemput', group: 'general', label: 'Nama Aplikasi', type: 'string' },
-    { key: 'fare.base', value: '5000', group: 'fare', label: 'Tarif dasar (Rp)', type: 'number' },
-    { key: 'fare.per_km', value: '2500', group: 'fare', label: 'Tarif per km (Rp)', type: 'number' },
-    { key: 'fare.per_min', value: '150', group: 'fare', label: 'Tarif per menit (Rp)', type: 'number' },
-    { key: 'fare.min', value: '8000', group: 'fare', label: 'Tarif minimum (Rp)', type: 'number' },
-    { key: 'fare.service_fee', value: '0.08', group: 'fare', label: 'Biaya layanan (%)', type: 'number' },
+    { key: 'app.name', value: 'Ansian', group: 'general', label: 'Nama Aplikasi', type: 'string' },
+    { key: 'app.tagline', value: 'Antar Jemput Dinusian', group: 'general', label: 'Tagline', type: 'string' },
+    { key: 'fare.zone_green', value: '4000', group: 'fare', label: 'Zona Hijau (0–2,5 km) — tarif (Rp)', type: 'number' },
+    { key: 'fare.zone_yellow_start', value: '5000', group: 'fare', label: 'Zona Kuning — tarif di 3 km (Rp)', type: 'number' },
+    { key: 'fare.zone_yellow_end', value: '15000', group: 'fare', label: 'Zona Kuning — tarif di 6 km (Rp)', type: 'number' },
+    { key: 'fare.zone_orange_start', value: '16000', group: 'fare', label: 'Zona Jingga — tarif di 7 km (Rp)', type: 'number' },
+    { key: 'fare.zone_orange_end', value: '20000', group: 'fare', label: 'Zona Jingga — tarif di 10 km (Rp)', type: 'number' },
+    { key: 'fare.zone_red_base', value: '20000', group: 'fare', label: 'Zona Merah — tarif dasar (Rp)', type: 'number' },
+    { key: 'fare.zone_red_per_km', value: '1500', group: 'fare', label: 'Zona Merah — per km setelah 11 km (Rp)', type: 'number' },
+    { key: 'fare.admin_green_yellow', value: '500', group: 'fare', label: 'Biaya admin zona hijau & kuning (Rp)', type: 'number' },
+    { key: 'fare.admin_orange_red', value: '1000', group: 'fare', label: 'Biaya admin zona jingga & merah (Rp)', type: 'number' },
     { key: 'ride.search_radius_km', value: '5', group: 'ride', label: 'Radius pencarian driver (km)', type: 'number' },
     { key: 'ride.cancel_free_min', value: '2', group: 'ride', label: 'Gratis pembatalan (menit)', type: 'number' },
     { key: 'driver.max_document', value: '4.7', group: 'driver', label: 'Rating minimum driver', type: 'number' },
-    { key: 'payment.midtrans.enabled', value: 'true', group: 'payment', label: 'Aktifkan Midtrans', type: 'boolean' },
-    { key: 'payment.xendit.enabled', value: 'true', group: 'payment', label: 'Aktifkan Xendit', type: 'boolean' },
+    { key: 'payment.cash.enabled', value: 'true', group: 'payment', label: 'Aktifkan Tunai', type: 'boolean' },
+    { key: 'payment.qris.enabled', value: 'true', group: 'payment', label: 'Aktifkan QRIS', type: 'boolean' },
+    { key: 'payment.qris.image_url', value: '/qris.svg', group: 'payment', label: 'Gambar QRIS statis (dari backend)', type: 'string' },
+    { key: 'payment.qris.merchant', value: 'Ansian', group: 'payment', label: 'Nama merchant QRIS', type: 'string' },
     { key: 'chat.auto_reply', value: 'true', group: 'chat', label: 'Balasan otomatis CS', type: 'boolean' },
   ]
 }
@@ -443,6 +454,19 @@ const notifications = buildNotifications(rides)
 const settings = buildSettings()
 const jobs: DriverJob[] = []
 
+/** Tantangan kode verifikasi email (OTP) — mock pengganti pengiriman email */
+export interface OtpChallenge {
+  id: string
+  user_id: number
+  purpose: 'register' | 'login'
+  code: string
+  email: string
+  expires_at: number
+  attempts: number
+}
+
+const otpChallenges: OtpChallenge[] = []
+
 export const db = {
   users,
   drivers,
@@ -452,7 +476,8 @@ export const db = {
   notifications,
   settings,
   jobs,
-  counters: { job: 1, message: 1000, notification: 100 },
+  otpChallenges,
+  counters: { job: 1, message: 1000, notification: 100, otp: 1 },
   /* Password akun mock, key = email. Hanya untuk demo frontend, bukan kontrak backend. */
   passwords: new Map<string, string>(users.map(u => [u.email, u.role === 'admin' ? 'admin123' : 'password'])),
 }
@@ -483,9 +508,9 @@ export function rideByCode(code: string): Ride | undefined {
   return db.rides.find(r => r.ride_code === code)
 }
 
-export function activeRideForUser(userId: number, role: 'rider' | 'driver'): Ride | undefined {
+export function activeRideForUser(userId: number, role: 'customer' | 'driver'): Ride | undefined {
   return db.rides.find(r => {
-    if (role === 'rider') return r.rider_id === userId && ['searching', 'driver_assigned', 'driver_arrived', 'in_progress'].includes(r.status)
+    if (role === 'customer') return r.customer_id === userId && ['searching', 'driver_assigned', 'driver_arrived', 'in_progress'].includes(r.status)
     if (r.driver_id === null) return false
     const profile = db.drivers.find(d => d.id === r.driver_id)
     return profile?.user_id === userId && ['driver_assigned', 'driver_arrived', 'in_progress'].includes(r.status)
@@ -493,19 +518,19 @@ export function activeRideForUser(userId: number, role: 'rider' | 'driver'): Rid
 }
 
 export function rideWithRelations(ride: Ride): Ride {
-  const rider = userById(ride.rider_id)
+  const customer = userById(ride.customer_id)
   const driver = ride.driver_id ? driverById(ride.driver_id) : null
   const rating = ride.rating ?? (ride.status === 'completed' && ride.id % 3 === 0
     ? {
         id: ride.id * 10,
-        reviewer_id: ride.rider_id,
+        reviewer_id: ride.customer_id,
         score: 5,
         comment: 'Driver ramah dan cepat. Pasti langganan!',
         tags: ['ramah', 'tepat waktu'],
         created_at: ride.completed_at ?? ride.updated_at,
       }
     : null)
-  return { ...ride, rider, driver, rating }
+  return { ...ride, customer, driver, rating }
 }
 
 export function paymentsForRide(rideId: number): Payment | undefined {
@@ -514,12 +539,10 @@ export function paymentsForRide(rideId: number): Payment | undefined {
   return {
     id: rideId * 7,
     ride_id: rideId,
-    gateway: ride.payment_method === 'xendit' ? 'xendit' : ride.payment_method === 'midtrans' ? 'midtrans' : 'manual',
     method: ride.payment_method,
     amount: ride.fare,
     status: ride.payment_status,
     reference: `INV-${ride.ride_code}-${(rideId * 7919) % 100000}`,
-    checkout_url: ride.payment_method === 'cash' || ride.payment_method === 'wallet' ? null : `https://checkout.example/${ride.ride_code}`,
     paid_at: ride.payment_status === 'paid' ? (ride.completed_at ?? ride.updated_at) : null,
     created_at: ride.created_at,
   }

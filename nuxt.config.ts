@@ -17,7 +17,6 @@ export default defineNuxtConfig({
         output: {
           manualChunks(id) {
             if (id.includes('node_modules/leaflet')) return 'leaflet'
-            if (id.includes('node_modules/echarts') || id.includes('node_modules/zrender')) return 'echarts'
             if (id.includes('node_modules/pusher-js') || id.includes('node_modules/laravel-echo')) return 'realtime'
           },
         },
@@ -27,11 +26,11 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      // Ganti ke URL Laravel backend, contoh: https://api.antarjemput.test
+      // Ganti ke URL Laravel backend, contoh: https://api.ansian.id
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000',
       // true = pakai mock API bawaan (server/api). false = panggil Laravel.
       useMock: process.env.NUXT_PUBLIC_USE_MOCK !== 'false',
-      appName: 'AntarJemput',
+      appName: 'Ansian',
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
       currency: 'IDR',
       // Realtime (Laravel Reverb / Soketi)

@@ -11,7 +11,7 @@ const toast = useToast()
 const payOpen = ref(false)
 const selectedRide = ref<number | null>(null)
 const paying = ref(false)
-const method = ref<'qris' | 'midtrans' | 'xendit' | 'wallet'>('qris')
+const method = ref<'qris' | 'cash'>('qris')
 
 const { data, pending, refresh } = await useAsyncData(`payments-${auth.user?.id}`, () =>
   http.get<PaginatedT<Payment>>('/payments', { per_page: 20 }).then(r => r),
@@ -31,11 +31,9 @@ const summary = computed(() => {
   }
 })
 
-const GATEWAYS = [
-  { value: 'qris' as const, label: 'QRIS', icon: 'inbox', desc: 'Semua e-wallet' },
-  { value: 'midtrans' as const, label: 'Midtrans', icon: 'credit-card', desc: 'VA / Kartu' },
-  { value: 'xendit' as const, label: 'Xendit', icon: 'zap', desc: 'OVO / DANA' },
-  { value: 'wallet' as const, label: 'Dompet', icon: 'briefcase', desc: 'Saldo app' },
+const METHODS = [
+  { value: 'qris' as const, label: 'QRIS', icon: 'inbox', desc: 'Semua e-wallet & m-banking' },
+  { value: 'cash' as const, label: 'Tunai', icon: 'wallet', desc: 'Bayar langsung ke driver' },
 ]
 
 const statusTone: Record<string, any> = {
@@ -63,15 +61,12 @@ async function confirmPay() {
   if (!selectedRide.value) return
   paying.value = true
   try {
-    const res = await http.post<{ data: Payment; meta?: { message?: string; checkout_url?: string } }>('/payments', {
+    await http.post<{ data: Payment; meta?: { message?: string } }>('/payments', {
       ride_id: selectedRide.value,
       method: method.value,
     })
-    toast.success('Pembayaran diproses…')
+    toast.success(method.value === 'cash' ? 'Pembayaran tunai dicatat. Bayar ke driver saat selesai.' : 'QRIS dibuat. Selesaikan scan untuk konfirmasi.')
     payOpen.value = false
-    if (res.meta?.checkout_url) {
-      toast.info('Mengalihkan ke halaman pembayaran gateway.')
-    }
     await refresh()
   } catch (e) {
     toast.error(e instanceof Error ? e.message : 'Gagal memproses pembayaran.')
@@ -126,11 +121,11 @@ onMounted(() => refresh())
             <tr v-for="p in payments" :key="p.id" class="transition hover:bg-ink-50/50">
               <td class="px-4 py-3">
                 <p class="font-mono text-xs font-semibold text-ink-800">{{ p.reference }}</p>
-                <p class="text-[10px] text-ink-400">Ride #{{ p.ride_id }}</p>
+                <p class="text-[10px] text-ink-400">Perjalanan #{{ p.ride_id }}</p>
               </td>
               <td class="px-4 py-3 text-xs text-ink-600">{{ formatDateTime(p.created_at) }}</td>
               <td class="px-4 py-3">
-                <UiBadge tone="gray" size="xs">{{ p.gateway }}</UiBadge>
+                <UiBadge tone="gray" size="xs">{{ p.method === 'qris' ? 'QRIS' : 'Tunai' }}</UiBadge>
               </td>
               <td class="px-4 py-3">
                 <UiBadge :tone="statusTone[p.status]" size="xs" dot>{{ statusLabel[p.status] }}</UiBadge>
@@ -160,13 +155,13 @@ onMounted(() => refresh())
     <UiModal
       :open="payOpen"
       title="Pilih metode pembayaran"
-      description="Pilih gateway yang ingin kamu gunakan."
+      description="Tunai langsung ke driver, atau QRIS lewat aplikasi apa pun."
       size="sm"
       @close="payOpen = false"
     >
       <div class="space-y-2">
         <button
-          v-for="g in GATEWAYS"
+          v-for="g in METHODS"
           :key="g.value"
           type="button"
           class="flex w-full items-center gap-3 rounded-xl border p-3 text-left transition"
@@ -184,8 +179,8 @@ onMounted(() => refresh())
 
       <div class="mt-4 rounded-xl bg-ink-50 p-3.5">
         <p class="text-[11px] text-ink-500">
-          Pada mode demo, transaksi akan disimulasikan. Integrasi Midtrans/Xendit resmi dilakukan di sisi backend Laravel
-          melalui webhook.
+          Mode demo: pembayaran QRIS disimulasikan. Di produksi, QRIS dibayar lewat aplikasi bank/e-wallet lalu
+          dikonfirmasi backend Laravel melalui webhook.
         </p>
       </div>
 

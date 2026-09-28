@@ -97,11 +97,11 @@ async function confirmCancel() {
   if (!ride.value) return
   cancelling.value = true
   try {
-    const res = await rideStore.transition(ride.value.id, 'cancel', { reason: 'rider_cancel' })
+    const res = await rideStore.transition(ride.value.id, 'cancel', { reason: 'customer_cancel' })
     cancelOpen.value = false
     toast.success('Perjalanan dibatalkan.')
     if (res.data) {
-      await router.push(`/rider/rides/${ride.value.id}`)
+      await router.push(`/customer/rides/${ride.value.id}`)
     }
   } catch (e) {
     toast.error(e instanceof Error ? e.message : 'Gagal membatalkan.')
@@ -124,7 +124,7 @@ async function submitRating(payload: { score: number; comment: string | null; ta
 async function openChat() {
   if (!ride.value) return
   await chat.openConversation(ride.value.ride_code)
-  await router.push('/rider/chat')
+  await router.push('/customer/chat')
 }
 </script>
 
@@ -136,7 +136,7 @@ async function openChat() {
         title="Tidak ada perjalanan aktif"
         description="Kamu belum punya perjalanan yang sedang berjalan."
       >
-        <UiButton to="/rider/book">Pesan Sekarang</UiButton>
+        <UiButton to="/customer/book">Pesan Sekarang</UiButton>
       </AppEmptyState>
     </div>
 
@@ -197,7 +197,7 @@ async function openChat() {
             </div>
           </div>
           <div class="mt-5 flex gap-2">
-            <UiButton to="/rider/chat" variant="outline" size="sm">
+            <UiButton to="/customer/chat" variant="outline" size="sm">
               <template #icon><UiIcon name="message-circle" class="size-4" /></template>
               Chat CS
             </UiButton>
@@ -315,7 +315,7 @@ async function openChat() {
               </UiButton>
               <UiButton
                 v-if="ride.status === 'completed'"
-                to="/rider/book"
+                to="/customer/book"
                 variant="primary"
                 size="sm"
                 block
@@ -346,7 +346,7 @@ async function openChat() {
         <p class="text-sm text-ink-600">Alasan pembatalan:</p>
         <div class="space-y-2">
           <label v-for="r in ['Jemputan berubah', 'Tidak jadi bepergian', 'Harga terlalu mahal', 'Lainnya']" :key="r" class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-ink-200 px-3 py-2.5 text-sm transition hover:bg-ink-50">
-            <input type="radio" name="alert-circle" value="rider_cancel" class="size-4 text-brand-600">
+            <input type="radio" name="alert-circle" value="customer_cancel" class="size-4 text-brand-600">
             {{ r }}
           </label>
         </div>

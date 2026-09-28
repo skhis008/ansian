@@ -1,54 +1,56 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 useSeoMeta({
-  title: 'Tentang Kami — AntarJemput',
-  description: 'AntarJemput adalah platform transport online yang menghubungkan penumpang dengan driver terverifikasi di sekitar Jakarta dan kota-kota lain.',
+  title: 'Tentang Kami — Ansian',
+  description:
+    'Ansian (Antar Jemput Dinusian) adalah antar-jemput motor berbasis zona tarif di area Udinus dan sekitarnya, sekaligus wadah kerja sampingan bagi mahasiswa.',
 })
 
 const values = [
   {
-    icon: 'shield-check',
-    title: 'Keamanan lebih dulu',
-    text: 'Setiap driver melewati verifikasi dokumen, dan setiap perjalanan terlacak. Kami mengutamakan keselamatan baik penumpang maupun driver.',
-  },
-  {
     icon: 'percent',
-    title: 'Transparansi penuh',
-    text: 'Tarif dihitung dengan rumus yang sama untuk semua pengguna dan ditampilkan lengkap sebelum konfirmasi.',
+    title: 'Tarif jujur, lebih hemat',
+    text: 'Tarif ditentukan zona jarak dan tampil sebelum pesan — tanpa lonjakan harga, tanpa biaya layanan tersembunyi.',
   },
   {
-    icon: 'activity',
-    title: 'Teknologi sederhana',
-    text: 'Arsitektur backend Laravel dengan realtime WebSocket, dan frontend Nuxt yang ringan serta cepat.',
+    icon: 'briefcase',
+    title: 'Peluang untuk mahasiswa',
+    text: 'Ansian lahir karena mahasiswa sering bingung mau promosi ke mana untuk kerja sampingan. Di sini, order datang sendiri.',
+  },
+  {
+    icon: 'shield-check',
+    title: 'Driver terverifikasi',
+    text: 'Setiap driver adalah mahasiswa dengan NIM dan kendaraan yang diverifikasi admin sebelum boleh menerima order.',
   },
   {
     icon: 'users',
-    title: 'Kesetaraan driver',
-    text: 'Driver bebas mengatur waktu online, memilih perjalanan yang sesuai, dan transparan soal pendapatan.',
+    title: 'Untuk warga lokal juga',
+    text: 'Pelanggan bebas siapa saja — mahasiswa maupun warga lokal area Udinus — dengan pelayanan yang sama.',
   },
 ]
 
 const timeline = [
-  { year: '2024', title: 'Awal proyek', text: 'Konsep dan prototipe aplikasi dibangun untuk menjeda kesenjangan transportasi di Jabodetabek.' },
-  { year: '2025', title: 'Uji coba di Jakarta', text: 'Meluncur dengan 120 driver terverifikasi di 3 wilayah dan rata-rata rating 4,8.' },
-  { year: '2026', title: 'Ekspansi', text: 'Peluncuran dashboard admin, pembayaran QRIS, serta perluasan ke Bandung dan Surabaya.' },
+  { year: '2025', title: 'Ide lahir dari kampus', text: 'Mahasiswa ingin penghasilan sampingan tapi bingung promosi; perjalanan antar-jemput di sekitar kampus masih acak-acakan.' },
+  { year: '2026', title: 'Ansian dirancang', text: 'Konsep tarif zona yang hemat dan pendaftaran driver khusus mahasiswa dirancang tim kecil di Semarang.' },
+  { year: '2026', title: 'Peluncuran area Udinus', text: 'Uji coba layanan motor di area Udinus dan sekitarnya, dengan pembayaran tunai dan QRIS.' },
 ]
 
 const team = [
-  { name: 'Andi Saputra', role: 'Founder & CEO', initials: 'AS' },
-  { name: 'Nadia Rahman', role: 'Head of Operations', initials: 'NR' },
-  { name: 'Bayu Setiawan', role: 'Engineering Lead', initials: 'BS' },
-  { name: 'Sinta Maharani', role: 'Head of Support', initials: 'SM' },
+  { name: 'Alif Fahri Octavianto (Rio)', role: 'Frontend Developer & Founder', initials: 'AF' },
+  { name: 'Wiratama Rava Rahardia (Wira)', role: 'Backend Developer', initials: 'WR' },
+  { name: 'Farid Nur Cahyo (Farid)', role: 'Customer Service & UI/UX Design', initials: 'FN' },
+  { name: 'M Setya Angga Adi Prabowo (Angga)', role: 'Customer Service', initials: 'MS' },
 ]
 </script>
 
 <template>
   <div class="container-app py-12">
     <header class="max-w-3xl">
-      <h1 class="text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">Tentang AntarJemput</h1>
+      <h1 class="text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">Tentang Ansian</h1>
       <p class="mt-4 text-[15px] leading-relaxed text-ink-600">
-        Kami membangun AntarJemput karena menemukan satu hal sederhana: Transportasi di kota besar seharusnya sesederhana mengetuk aplikasi —
-        tarif jelas, driver cepat datang, dan perjalanan terasa aman.
+        <strong class="font-semibold text-ink-800">Ansian (Antar Jemput Dinusian)</strong> dibangun untuk dua hal yang
+        saling terhubung: membuat perjalanan antar-jemput di area Udinus lebih hemat, dan membuka peluang kerja
+        sampingan bagi mahasiswa yang selama ini bingung mau promosi ke mana.
       </p>
     </header>
 
@@ -56,13 +58,13 @@ const team = [
       <UiCard class="lg:col-span-2">
         <h2 class="text-lg font-bold text-ink-900">Misi kami</h2>
         <p class="mt-3 text-[14px] leading-relaxed text-ink-600">
-          Memberikan akses transport yang andal dan terjangkau bagi semua orang, sekaligus membuka peluang pendapatan
-          yang layak bagi driver. Kami percaya teknologi yang baik adalah yang terasa transparan, tidak membingungkan,
-          dan tidak memaksa.
+          Menyediakan layanan antar-jemput motor dengan tarif zona yang hemat dan transparan bagi warga area Udinus —
+          sambil menjadi wadah penghasilan sampingan yang mudah diakses mahasiswa, tanpa perlu repot mencari pelanggan
+          sendiri.
         </p>
         <p class="mt-3 text-[14px] leading-relaxed text-ink-600">
-          Setiap keputusan produk — mulai dari tarif terbuka, driver terdekat, sampai chat bawaan — dibuat dengan satu
-          tujuan: membuat perjalanan terasa aman dari titik pertama hingga tiba.
+          Setiap keputusan produk — dari tarif yang tampil di awal, verifikasi kode lewat email, sampai pendaftaran
+          driver khusus mahasiswa — dibuat agar sederhana, jujur, dan menguntungkan kedua belah pihak.
         </p>
       </UiCard>
 
@@ -70,11 +72,11 @@ const team = [
         <h2 class="text-lg font-bold text-ink-900">Fakta singkat</h2>
         <dl class="mt-4 space-y-3">
           <div v-for="f in [
-            ['Didirikan', 'Jakarta, 2024'],
-            ['Kota beroperasi', 'Jakarta, Bandung, Surabaya'],
-            ['Driver aktif', '18.400+'],
-            ['Rating rata-rata', '4,9 / 5'],
-            ['Perjalanan selesai', '2,4 juta+'],
+            ['Nama', 'Ansian (Antar Jemput Dinusian)'],
+            ['Area layanan', 'Udinus & sekitarnya, Semarang'],
+            ['Armada', 'Motor'],
+            ['Pembayaran', 'Tunai & QRIS'],
+            ['Tarif', '4 zona, tanpa lonjakan'],
           ]" :key="f[0]" class="flex items-center justify-between gap-3 border-b border-ink-100 pb-2.5 last:border-0">
             <dt class="text-[13px] text-ink-500">{{ f[0] }}</dt>
             <dd class="text-[13px] font-bold text-ink-900">{{ f[1] }}</dd>
@@ -125,10 +127,10 @@ const team = [
     <UiCard class="mt-14 text-center">
       <h2 class="text-lg font-bold text-ink-900">Ingin jadi bagian dari perjalanan ini?</h2>
       <p class="mx-auto mt-2 max-w-md text-[13.5px] text-ink-600">
-        Baik sebagai penumpang yang mencari perjalanan aman, atau driver yang ingin bekerja lebih baik.
+        Pesan perjalanan hemat sebagai pelanggan, atau daftar sebagai driver mahasiswa dan mulai penghasilan sampinganmu.
       </p>
       <div class="mt-5 flex flex-wrap justify-center gap-2">
-        <UiButton to="/register">Daftar sebagai Penumpang</UiButton>
+        <UiButton to="/register">Daftar Sebagai Pelanggan</UiButton>
         <UiButton to="/driver/daftar" variant="outline">Gabung Jadi Driver</UiButton>
       </div>
     </UiCard>

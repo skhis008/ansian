@@ -1,5 +1,5 @@
 <template>
-  <!-- Placeholder QR statis (mode demo). Backend akan mengembalikan QR dinamis dari gateway. -->
+  <!-- Placeholder QR statis (mode demo). Backend akan mengembalikan QR dari backend. -->
   <svg viewBox="0 0 29 29" class="size-full" shape-rendering="crispEdges" role="img" aria-label="Kode QR pembayaran">
     <rect width="29" height="29" fill="#fff" />
     <g fill="#0f172a">

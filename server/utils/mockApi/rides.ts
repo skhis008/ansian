@@ -1,7 +1,8 @@
 import type { H3Event } from 'h3'
 import { createError, getQuery, getRouterParam } from 'h3'
 import type { FareQuote, Ride, RideStatus, DriverJob, ChatMessage, ChatMessageType, Payment } from '#shared/types'
-import { distanceKm, estimateFare, syntheticRoute, pathLengthKm, pathDurationMin, nearbyPoint } from '#shared/utils/geo'
+import { calculateZoneFare } from '#shared/utils/pricing'
+import { distanceKm, syntheticRoute, pathLengthKm, pathDurationMin, nearbyPoint } from '#shared/utils/geo'
 import {
   authUser,
   db,
@@ -25,7 +26,7 @@ import {
   rideById,
   rideWithRelations,
   userById,
-} from '#shared/mocks/db'
+} from './db'
 
 /* ==================================================================
  * FARES
@@ -41,22 +42,16 @@ export async function quoteFare(event: H3Event) {
 
   const p = body.pickup as { lat: number; lng: number }
   const d = body.destination as { lat: number; lng: number }
-  const straight = distanceKm(p, d)
   const route = syntheticRoute(p, d, 20)
   const distance = Math.max(0.4, pathLengthKm(route))
   const duration = Math.max(2, Math.round(pathDurationMin(route)))
-  const hour = new Date().getHours()
-  const peak = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)
-  const surge = peak ? 1.3 : 1
 
-  const payload = estimateFare(distance, duration, surge)
   const quote: FareQuote = {
-    ...payload,
+    ...calculateZoneFare(distance),
+    duration_min: duration,
     route,
-    nearest_drivers: 4 + Math.floor(Math.random() * 6),
+    nearest_drivers: Math.min(9, 3 + Math.round(distance)),
   }
-  quote.nearest_drivers = Math.min(9, 3 + Math.round(distance))
-  void straight
   return resource(quote)
 }
 
@@ -70,8 +65,8 @@ export async function listRides(event: H3Event) {
   const q = getQuery(event)
 
   let rides = db.rides.slice()
-  if (user.role === 'rider') {
-    rides = rides.filter(r => r.rider_id === user.id)
+  if (user.role === 'customer') {
+    rides = rides.filter(r => r.customer_id === user.id)
   } else if (user.role === 'driver') {
     const profile = driverByUserId(user.id)
     rides = rides.filter(r => r.driver_id === profile?.id)
@@ -140,7 +135,7 @@ function simulateDispatch(ride: Ride): Ride {
 /** GET /api/v1/rides/active */
 export async function getActiveRide(event: H3Event) {
   const user = authUser(event)
-  const ride = activeRideForUser(user.id, user.role === 'driver' ? 'driver' : 'rider')
+  const ride = activeRideForUser(user.id, user.role === 'driver' ? 'driver' : 'customer')
   if (ride) simulateDispatch(ride)
   return resource(ride ? rideWithRelations(ride) : null)
 }
@@ -177,7 +172,7 @@ export async function createRide(event: H3Event) {
     destination: required('Tujuan'),
   })
 
-  const existing = activeRideForUser(user.id, 'rider')
+  const existing = activeRideForUser(user.id, 'customer')
   if (existing) {
     throw createError({ statusCode: 409, data: { message: 'Anda masih punya perjalanan yang sedang berjalan.' } })
   }
@@ -191,11 +186,13 @@ export async function createRide(event: H3Event) {
   const route = syntheticRoute(p, d, 20)
   const distance = pathLengthKm(route)
   const duration = pathDurationMin(route)
-  const surge = Number(body.surge_multiplier) || 1
-  const fare = estimateFare(distance, duration, surge)
+  if (!['cash', 'qris'].includes(String(body.payment_method ?? 'cash'))) {
+    throw createError({ statusCode: 422, data: { message: 'Metode pembayaran tidak valid.', errors: { payment_method: ['Hanya Tunai atau QRIS.'] } } })
+  }
+  const fare = calculateZoneFare(distance)
 
   const now = new Date()
-  const code = `AJ-${String(now.getFullYear()).slice(2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(Math.floor(Math.random() * 9000) + 1000)}`
+  const code = `ASN-${String(now.getFullYear()).slice(2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(Math.floor(Math.random() * 9000) + 1000)}`
 
   const ride: Ride = {
     id: Math.max(...db.rides.map(r => r.id)) + 1,
@@ -207,13 +204,12 @@ export async function createRide(event: H3Event) {
     destination: { lat: d.lat, lng: d.lng, address: d.address, place_name: d.place_name ?? d.address },
     pickup_note: body.pickup_note ?? null,
     distance_km: fare.distance_km,
-    duration_min: fare.duration_min,
+    duration_min: Math.max(2, Math.round(duration)),
     fare: body.fare_override ?? fare.total,
-    surge_multiplier: surge,
     payment_method: body.payment_method ?? 'cash',
-    payment_status: body.payment_method === 'cash' ? 'unpaid' : 'unpaid',
+    payment_status: 'unpaid',
     cancel_reason: null,
-    rider_id: user.id,
+    customer_id: user.id,
     driver_id: null,
     status_histories: [{ id: Date.now(), status: 'searching', note: null, created_at: nowIso() }],
     started_at: null,
@@ -239,7 +235,7 @@ export async function cancelRide(event: H3Event) {
   }
 
   const body = await readPayload(event)
-  const reason = body.reason ?? (user.role === 'driver' ? 'driver_cancel' : 'rider_cancel')
+  const reason = body.reason ?? (user.role === 'driver' ? 'driver_cancel' : 'customer_cancel')
   ride.status = 'cancelled'
   ride.cancel_reason = reason
   ride.cancelled_at = nowIso()
@@ -268,7 +264,7 @@ export async function rateRide(event: H3Event) {
   if (ride.status !== 'completed') {
     throw createError({ statusCode: 409, data: { message: 'Hanya perjalanan selesai yang bisa diberi rating.' } })
   }
-  if (ride.rider_id !== user.id) {
+  if (ride.customer_id !== user.id) {
     throw createError({ statusCode: 403, data: { message: 'Tidak berwenang.' } })
   }
   if (ride.rating) {
@@ -318,7 +314,7 @@ export async function rideTimeline(event: H3Event) {
 /** GET /api/v1/drivers — daftar driver (admin) */
 export async function listDrivers(event: H3Event) {
   const user = authUser(event)
-  if (user.role === 'rider') {
+  if (user.role === 'customer') {
     throw createError({ statusCode: 403, data: { message: 'Tidak punya akses.' } })
   }
   const list = db.drivers
@@ -364,7 +360,7 @@ export async function nearbyDrivers(event: H3Event) {
 /** GET /api/v1/drivers/{driver} */
 export async function showDriver(event: H3Event) {
   const user = authUser(event)
-  if (user.role === 'rider') {
+  if (user.role === 'customer') {
     throw createError({ statusCode: 403, data: { message: 'Tidak punya akses.' } })
   }
   return resource(findOr404(driverById(Number(getRouterParam(event, 'driver'))), 'Driver tidak ditemukan.'))
@@ -504,7 +500,7 @@ export async function markArrived(event: H3Event) {
     throw createError({ statusCode: 409, data: { message: 'Status perjalanan tidak sesuai.' } })
   }
   transition(ride, 'driver_arrived', 'Driver sudah di lokasi')
-  return resource(rideWithRelations(ride), { message: 'Penumpang sudah diinformasikan.' })
+  return resource(rideWithRelations(ride), { message: 'Pelanggan sudah diinformasikan.' })
 }
 
 /** POST /api/v1/drivers/rides/{ride}/start */
@@ -716,10 +712,27 @@ export async function readAllNotifications(event: H3Event) {
  * PAYMENTS
  * ================================================================== */
 
+/** GET /api/v1/payments/qris — QR statis dari backend (bukan dari frontend) */
+export async function qrisConfig() {
+  const image = db.settings.find(s => s.key === 'payment.qris.image_url')?.value ?? '/qris.svg'
+  const merchant = db.settings.find(s => s.key === 'payment.qris.merchant')?.value ?? 'Ansian'
+  const enabled = db.settings.find(s => s.key === 'payment.qris.enabled')?.value === 'true'
+  return resource({
+    image_url: image,
+    merchant_name: merchant,
+    enabled,
+    instructions: [
+      'Buka aplikasi e-wallet / mobile banking pilihanmu.',
+      'Pindai kode QRIS dan masukkan nominal sesuai tagihan.',
+      'Selesaikan pembayaran, lalu kembali ke aplikasi.',
+    ],
+  })
+}
+
 /** GET /api/v1/payments */
 export async function listPayments(event: H3Event) {
   const user = authUser(event)
-  const rides = db.rides.filter(r => r.rider_id === user.id || (user.role === 'driver' && r.driver_id === driverByUserId(user.id)?.id))
+  const rides = db.rides.filter(r => r.customer_id === user.id || (user.role === 'driver' && r.driver_id === driverByUserId(user.id)?.id))
   const payments = rides.map(r => paymentsForRide(r.id)).filter(Boolean) as Payment[]
   const sorted = payments.sort((a, b) => b.created_at.localeCompare(a.created_at))
   const page = paginate(sorted, event, 15)
@@ -731,26 +744,25 @@ export async function createPayment(event: H3Event) {
   const user = authUser(event)
   const body = await readPayload(event)
   const ride = findOr404(rideById(Number(body.ride_id)), 'Perjalanan tidak ditemukan.')
-  if (ride.rider_id !== user.id) {
+  if (ride.customer_id !== user.id) {
     throw createError({ statusCode: 403, data: { message: 'Tidak berwenang.' } })
   }
   validate(body, {
-    method: (v: unknown) => (['qris', 'midtrans', 'xendit', 'wallet', 'cash'].includes(String(v)) ? null : 'Metode pembayaran tidak valid.'),
+    method: (v: unknown) => (['cash', 'qris'].includes(String(v)) ? null : 'Metode pembayaran tidak valid.'),
   })
   await delay(500)
 
   ride.payment_method = body.method
-  ride.payment_status = 'pending'
+  ride.payment_status = body.method === 'cash' ? 'unpaid' : 'pending'
   ride.updated_at = nowIso()
 
   const payment = paymentsForRide(ride.id)!
   return resource(payment, {
-    message: 'Redirect ke halaman pembayaran…',
-    checkout_url: payment.checkout_url,
+    message: body.method === 'cash' ? 'Bayar tunai saat perjalanan selesai.' : 'Selesaikan pembayaran dengan memindai QRIS.',
   })
 }
 
-/** POST /api/v1/payments/{payment}/webhook — dipanggil gateway (tanpa auth) */
+/** POST /api/v1/payments/{payment}/webhook — konfirmasi QRIS (admin tandai lunas / webhook mock) */
 export async function paymentWebhook(event: H3Event) {
   const body = await readPayload(event)
   const payment = db.rides
@@ -780,7 +792,7 @@ export async function paymentWebhook(event: H3Event) {
 
 function authorizeRide(user: { id: number; role: string }, ride: Ride) {
   if (user.role === 'admin') return
-  if (user.role === 'rider' && ride.rider_id === user.id) return
+  if (user.role === 'customer' && ride.customer_id === user.id) return
   if (user.role === 'driver') {
     const profile = driverByUserId(user.id)
     if (profile && ride.driver_id === profile.id) return
@@ -798,7 +810,7 @@ function rideOwnedBy(rideId: number | null, userId: number): boolean {
   if (!rideId) return true
   const ride = rideById(rideId)
   if (!ride) return false
-  if (ride.rider_id === userId) return true
+  if (ride.customer_id === userId) return true
   const profile = db.drivers.find(d => d.user_id === userId)
   return Boolean(profile && ride.driver_id === profile.id)
 }
@@ -818,7 +830,7 @@ function autoReply(text: string): string {
   if (t.includes('lama') || t.includes('lambat')) return 'Maaf ya, macet di jalan. Saya kurang lebih 5 menit lagi sampai.'
   if (t.includes('alamat') || t.includes('lokasi')) return 'Baik, saya cek dulu lokasi yang Anda kirim ya.'
   if (t.includes('harga') || t.includes('tarif')) return 'Tarif sudah tertera di aplikasi ya, Kak. Tidak ada biaya tambahan.'
-  if (t.includes('bayar') || t.includes('payment')) return 'Pembayaran lewat QRIS, saldo, atau tunai ya sesuai pilihan di aplikasi.'
+  if (t.includes('bayar') || t.includes('payment')) return 'Pembayaran lewat QRIS atau tunai ya sesuai pilihan di aplikasi.'
   if (t.includes('halo') || t.includes('hai') || t.includes('hello')) return 'Halo! Saya Dimas, siap mengantar. Ada yang bisa dibantu?'
   return 'Siap, understood. Terima kasih sudah memberi tahu 🙏'
 }
@@ -835,9 +847,8 @@ export function spawnJobs(ride: Ride) {
     distance_km: ride.distance_km,
     duration_min: ride.duration_min,
     fare: ride.fare,
-    surge_multiplier: ride.surge_multiplier,
-    rider_name: userById(ride.rider_id)?.name ?? 'Penumpang',
-    rider_rating: 4.9,
+    customer_name: userById(ride.customer_id)?.name ?? 'Pelanggan',
+    customer_rating: 4.9,
     distance_to_pickup_km: 0.6,
     expires_in_seconds: 60,
     created_at: nowIso(),

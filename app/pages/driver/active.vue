@@ -90,7 +90,7 @@ async function advance() {
     rideStore.setActive(res.data)
     await refresh()
     toast.success(
-      arrived.value ? 'Perjalanan dimulai. Hati-hati di jalan!' : 'Penumpang sudah tiba di lokasi jemput.',
+      arrived.value ? 'Perjalanan dimulai. Hati-hati di jalan!' : 'Pelanggan sudah tiba di lokasi jemput.',
     )
   } catch (e) {
     toast.error(e instanceof Error ? e.message : 'Gagal memperbarui status.')
@@ -140,7 +140,7 @@ async function openChat() {
       </span>
       <p class="mt-4 text-sm font-bold text-ink-800">Tidak ada perjalanan aktif</p>
       <p class="mx-auto mt-1 max-w-sm text-xs text-ink-500">
-        Terima permintaan baru untuk mulai mengantar penumpang.
+        Terima permintaan baru untuk mulai mengantar pelanggan.
       </p>
       <UiButton class="mt-5" to="/driver/requests">Lihat Permintaan</UiButton>
     </div>
@@ -199,20 +199,20 @@ async function openChat() {
 
       <!-- Sidebar aksi -->
       <div class="space-y-4 lg:col-span-2">
-        <UiCard v-if="rideStore.activeRide.rider">
-          <h2 class="text-sm font-bold text-ink-900">Penumpang</h2>
+        <UiCard v-if="rideStore.activeRide.customer">
+          <h2 class="text-sm font-bold text-ink-900">Pelanggan</h2>
           <div class="mt-3 flex items-center gap-3">
-            <UiAvatar :name="rideStore.activeRide.rider.name" :src="rideStore.activeRide.rider.avatar_url" :size="44" />
+            <UiAvatar :name="rideStore.activeRide.customer.name" :src="rideStore.activeRide.customer.avatar_url" :size="44" />
             <div class="min-w-0">
-              <p class="truncate text-sm font-bold text-ink-900">{{ rideStore.activeRide.rider.name }}</p>
+              <p class="truncate text-sm font-bold text-ink-900">{{ rideStore.activeRide.customer.name }}</p>
               <p class="flex items-center gap-1 text-[11px] text-ink-500">
                 <UiIcon name="star" class="size-3 fill-amber-400 text-amber-400" />
-                {{ rideStore.activeRide.rider.rating ?? 'Baru' }} · {{ rideStore.activeRide.rider.rating_count }} ulasan
+                {{ rideStore.activeRide.customer.rating ?? 'Baru' }} · {{ rideStore.activeRide.customer.rating_count }} ulasan
               </p>
             </div>
           </div>
-          <p v-if="rideStore.activeRide.rider.phone" class="mt-3 rounded-lg bg-ink-50 px-3 py-2 text-[12px] text-ink-600">
-            {{ rideStore.activeRide.rider.phone }}
+          <p v-if="rideStore.activeRide.customer.phone" class="mt-3 rounded-lg bg-ink-50 px-3 py-2 text-[12px] text-ink-600">
+            {{ rideStore.activeRide.customer.phone }}
           </p>
         </UiCard>
 
