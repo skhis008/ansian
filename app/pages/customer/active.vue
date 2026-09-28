@@ -123,8 +123,8 @@ async function submitRating(payload: { score: number; comment: string | null; ta
 
 async function openChat() {
   if (!ride.value) return
-  await chat.openConversation(ride.value.ride_code)
-  await router.push('/customer/chat')
+  const conv = await chat.openConversation(ride.value.ride_code)
+  await router.push(conv ? `/customer/chat/${conv.id}` : '/customer/chat')
 }
 </script>
 

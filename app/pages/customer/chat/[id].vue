@@ -15,18 +15,13 @@ const conversation = computed(() => chat.activeConversation)
 const messages = computed(() => (chat.activeId ? chat.messagesOf(chat.activeId) : []))
 
 onMounted(async () => {
+  const id = Number(route.params.id)
+  if (!id) {
+    await navigateTo('/customer/chat', { replace: true })
+    return
+  }
   await chat.fetchConversations()
-  const id = Number(route.params.id) || Number(route.query.id)
-  if (id) {
-    await chat.fetchMessages(id)
-  } else {
-    const first = chat.conversations[0]
-    if (first) await chat.fetchMessages(first.id)
-  }
-  if (route.query.new === 'support') {
-    const support = chat.conversations.find(c => c.type === 'support')
-    if (support) await chat.fetchMessages(support.id)
-  }
+  await chat.fetchMessages(id)
 })
 
 /* Realtime: dengarkan channel ride untuk pesan baru */
@@ -48,11 +43,6 @@ async function send(body: string) {
 }
 
 function openRide(code: string) {
-  const conv = chat.conversations.find(c => c.ride_code === code)
-  const rideId = chat.conversations.findIndex(c => c.ride_code === code)
-  void conv
-  void rideId
-  toast.info('Membuka detail perjalanan…')
   navigateTo(`/customer/rides?search=${code}`)
 }
 </script>

@@ -105,7 +105,7 @@ async function logout() {
       </div>
     </UiCard>
 
-    <!-- Info -->
+    <!-- Informasi & Keamanan -->
     <div class="grid gap-5 sm:grid-cols-2">
       <UiCard>
         <h3 class="mb-4 text-sm font-bold text-ink-900">Informasi Akun</h3>
@@ -129,6 +129,14 @@ async function logout() {
             <dt class="text-[13px] text-ink-500">Bergabung sejak</dt>
             <dd class="text-right text-[13px] font-semibold text-ink-900">{{ formatDate(auth.user?.created_at) }}</dd>
           </div>
+          <div class="flex items-start justify-between gap-3 border-t border-ink-100 pt-3">
+            <dt class="text-[13px] text-ink-500">Status akun</dt>
+            <dd>
+              <UiBadge :tone="auth.user?.status === 'active' ? 'success' : 'warning'" size="xs" dot>
+                {{ auth.user?.status === 'active' ? 'Aktif' : auth.user?.status }}
+              </UiBadge>
+            </dd>
+          </div>
         </dl>
       </UiCard>
 
@@ -150,34 +158,75 @@ async function logout() {
             <UiIcon name="chevron-right" class="size-4 text-ink-400" />
           </button>
 
+          <div class="flex items-center gap-3 rounded-xl border border-ink-200 p-3">
+            <span class="grid size-9 place-items-center rounded-lg" :class="auth.user?.email_verified_at ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'">
+              <UiIcon :name="auth.user?.email_verified_at ? 'check-circle' : 'mail'" class="size-4" />
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[13px] font-semibold text-ink-900">Verifikasi email</span>
+              <span class="block text-[11px] text-ink-500">
+                {{ auth.user?.email_verified_at ? 'Email sudah terverifikasi' : 'Belum terverifikasi' }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </UiCard>
+    </div>
+
+    <!-- Dukungan & Sesi -->
+    <div class="grid gap-5 sm:grid-cols-2">
+      <UiCard>
+        <h3 class="mb-4 text-sm font-bold text-ink-900">Dukungan</h3>
+        <div class="space-y-3">
           <NuxtLink
             to="/customer/chat?new=support"
             class="flex items-center gap-3 rounded-xl border border-ink-200 p-3 transition hover:border-ink-300 hover:bg-ink-50"
           >
             <span class="grid size-9 place-items-center rounded-lg bg-violet-50 text-violet-600">
-              <UiIcon name="help-circle" class="size-4" />
+              <UiIcon name="message-circle" class="size-4" />
             </span>
             <span class="min-w-0 flex-1">
-              <span class="block text-[13px] font-semibold text-ink-900">Bantuan</span>
-              <span class="block text-[11px] text-ink-500">Hubungi customer service</span>
+              <span class="block text-[13px] font-semibold text-ink-900">Hubungi Customer Service</span>
+              <span class="block text-[11px] text-ink-500">Chat langsung dari halaman chat</span>
             </span>
             <UiIcon name="chevron-right" class="size-4 text-ink-400" />
           </NuxtLink>
 
-          <button
-            type="button"
-            class="flex w-full items-center gap-3 rounded-xl border border-red-200 p-3 text-left transition hover:bg-red-50"
-            @click="logout"
+          <NuxtLink
+            to="/faq"
+            class="flex items-center gap-3 rounded-xl border border-ink-200 p-3 transition hover:border-ink-300 hover:bg-ink-50"
           >
-            <span class="grid size-9 place-items-center rounded-lg bg-red-50 text-red-600">
-              <UiIcon name="logout" class="size-4" />
+            <span class="grid size-9 place-items-center rounded-lg bg-ink-100 text-ink-600">
+              <UiIcon name="help-circle" class="size-4" />
             </span>
             <span class="min-w-0 flex-1">
-              <span class="block text-[13px] font-semibold text-red-700">Keluar dari akun</span>
-              <span class="block text-[11px] text-red-500">Kamu perlu masuk lagi</span>
+              <span class="block text-[13px] font-semibold text-ink-900">Pusat Bantuan</span>
+              <span class="block text-[11px] text-ink-500">Pertanyaan yang sering diajukan</span>
             </span>
-          </button>
+            <UiIcon name="chevron-right" class="size-4 text-ink-400" />
+          </NuxtLink>
         </div>
+      </UiCard>
+
+      <UiCard>
+        <h3 class="mb-4 text-sm font-bold text-ink-900">Sesi</h3>
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-xl border border-red-200 p-3 text-left transition hover:bg-red-50"
+          @click="logout"
+        >
+          <span class="grid size-9 place-items-center rounded-lg bg-red-50 text-red-600">
+            <UiIcon name="logout" class="size-4" />
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block text-[13px] font-semibold text-red-700">Keluar dari akun</span>
+            <span class="block text-[11px] text-red-500">Kamu perlu masuk lagi</span>
+          </span>
+          <UiIcon name="chevron-right" class="size-4 text-red-400" />
+        </button>
+        <p class="mt-3 text-[11px] leading-relaxed text-ink-400">
+          Keluar hanya menghapus sesi di perangkat ini. Perangkat tepercaya tetap login otomatis selama 30 hari.
+        </p>
       </UiCard>
     </div>
 

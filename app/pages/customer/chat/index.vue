@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { formatRelative } from '#shared/utils/format'
 
 definePageMeta({ layout: 'app' })
@@ -14,15 +14,18 @@ const { pending } = await useAsyncData('chat-list', async () => {
   return true
 })
 
-/* Masuk dari /chat/:id atau dari CTA di halaman lain */
+/* CTA dari halaman lain (?new=support) dan link lama (?id) → buka halaman percakapan */
 onMounted(async () => {
-  const id = Number(route.query.id ?? route.params.id)
-  if (id && chat.conversations.some(c => c.id === id)) {
-    await chat.fetchMessages(id)
+  const legacyId = Number(route.query.id)
+  if (legacyId) {
+    await navigateTo(`/customer/chat/${legacyId}`, { replace: true })
+    return
+  }
+  if (route.query.new === 'support') {
+    const support = chat.conversations.find(c => c.type === 'support')
+    if (support) await navigateTo(`/customer/chat/${support.id}`, { replace: true })
   }
 })
-
-watch(search, () => undefined)
 
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
@@ -85,7 +88,7 @@ const groups = computed(() => {
     <ul v-else class="space-y-2">
       <li v-for="g in groups" :key="g.conv.id">
         <NuxtLink
-          :to="{ path: '/customer/chat', query: { id: g.conv.id } }"
+          :to="`/customer/chat/${g.conv.id}`"
           class="flex items-center gap-3.5 rounded-2xl border bg-white p-3.5 transition"
           :class="chat.activeId === g.conv.id ? 'border-brand-400 ring-1 ring-brand-200' : 'border-ink-200/80 hover:border-brand-300 hover:shadow-soft'"
         >

@@ -30,7 +30,7 @@ const values = [
 ]
 
 const timeline = [
-  { year: '2025', title: 'Ide lahir dari kampus', text: 'Mahasiswa ingin penghasilan sampingan tapi bingung promosi; perjalanan antar-jemput di sekitar kampus masih acak-acakan.' },
+  { year: '2026', title: 'Ide lahir dari keperluan mahasiswa', text: 'Mahasiswa butuh penghasilan sampingan tanpa ribet promosi, dan warga butuh antar-jemput yang hemat — dua keperluan itu yang memulai semuanya.' },
   { year: '2026', title: 'Ansian dirancang', text: 'Konsep tarif zona yang hemat dan pendaftaran driver khusus mahasiswa dirancang tim kecil di Semarang.' },
   { year: '2026', title: 'Peluncuran area Udinus', text: 'Uji coba layanan motor di area Udinus dan sekitarnya, dengan pembayaran tunai dan QRIS.' },
 ]

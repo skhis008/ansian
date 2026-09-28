@@ -114,9 +114,9 @@ const stats = [
             penghasilan sampingan tidak perlu bingung promosi: daftar, verifikasi, langsung dapat order.
           </p>
 
-          <div class="mt-7 flex flex-wrap items-center gap-3">
-            <UiButton to="/register" size="lg">Pesan Sekarang</UiButton>
-            <UiButton to="/driver/daftar" variant="outline" size="lg">
+          <div class="mt-7 grid max-w-lg gap-3 sm:grid-cols-2">
+            <UiButton to="/register" size="lg" block>Pesan Sekarang</UiButton>
+            <UiButton to="/driver/daftar" variant="outline" size="lg" block>
               <template #icon><UiIcon name="bike" class="size-4.5" /></template>
               Gabung Jadi Driver
             </UiButton>
@@ -349,9 +349,9 @@ const stats = [
         Buat akun gratis, masukkan kode verifikasi 6 digit yang dikirim ke emailmu, lalu pesan driver terdekat dalam
         hitungan detik.
       </p>
-      <div class="mt-7 flex flex-wrap justify-center gap-3">
-        <UiButton to="/register" size="lg">Daftar Gratis</UiButton>
-        <UiButton to="/login" size="lg" variant="outline">Sudah punya akun</UiButton>
+      <div class="mx-auto mt-7 grid max-w-lg gap-3 sm:grid-cols-2">
+        <UiButton to="/register" size="lg" block>Daftar Gratis</UiButton>
+        <UiButton to="/login" size="lg" variant="outline" block>Sudah punya akun</UiButton>
       </div>
     </section>
   </div>
